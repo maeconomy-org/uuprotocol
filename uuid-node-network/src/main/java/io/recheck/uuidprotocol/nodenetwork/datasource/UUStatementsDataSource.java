@@ -1,0 +1,19 @@
+package io.recheck.uuidprotocol.nodenetwork.datasource;
+
+import com.google.cloud.firestore.Filter;
+import io.recheck.uuidprotocol.nodenetwork.model.UUStatements;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class UUStatementsDataSource extends AuditDataSource<UUStatements> {
+    public UUStatementsDataSource() {
+        super(UUStatements.class);
+    }
+
+    public List<UUStatements> findBySubjectAndPredicate(String subject, String predicate) {
+        Filter filter = Filter.and(Filter.equalTo("subject", subject), Filter.equalTo("predicate", predicate));
+        return where(filter);
+    }
+}
