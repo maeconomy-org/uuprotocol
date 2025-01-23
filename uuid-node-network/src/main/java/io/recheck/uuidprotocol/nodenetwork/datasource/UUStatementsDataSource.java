@@ -16,4 +16,8 @@ public class UUStatementsDataSource extends AuditDataSource<UUStatements> {
         Filter filter = Filter.and(Filter.equalTo("subject", subject), Filter.equalTo("predicate", predicate));
         return where(filter);
     }
+
+    public List<UUStatements> findByPredicate(String predicate) {
+        return whereEqualTo("predicate", predicate);
+    }
 }

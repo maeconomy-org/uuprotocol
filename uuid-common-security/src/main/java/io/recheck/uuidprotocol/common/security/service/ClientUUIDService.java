@@ -40,14 +40,7 @@ public class ClientUUIDService {
     }
 
     public void validateClientUUID(String clientCertFingerprint, String uuid) {
-        validateClientUUID(clientCertFingerprint, clientUUIDDataSource.findByUUID(uuid));
-    }
-
-    public void validateClientUUID(String clientCertFingerprint, List<String> uuidList) {
-        clientUUIDDataSource.findByUUIDList(uuidList).forEach(clientUUID -> validateClientUUID(clientCertFingerprint, clientUUID));
-    }
-
-    public void validateClientUUID(String clientCertFingerprint, ClientUUID existingUUID) {
+        ClientUUID existingUUID = clientUUIDDataSource.findByUUID(uuid);
         if (existingUUID == null) {
             throw new NotFoundException("UUID not found");
         }

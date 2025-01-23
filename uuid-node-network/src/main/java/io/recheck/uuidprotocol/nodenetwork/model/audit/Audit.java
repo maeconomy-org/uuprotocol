@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class AuditCommon implements Created, LastUpdated, SoftDeleted {
+public class Audit implements Created, LastUpdated, SoftDeleted {
 
     private Instant createdAt;
     private String createdBy;

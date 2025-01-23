@@ -9,11 +9,6 @@ import org.springframework.beans.BeanUtils;
 @Data
 public class UUPropertyValueDTO {
 
-    private String id;
-
-    @NotBlank
-    private String propertyId;
-
     @NotBlank
     private String value;
 

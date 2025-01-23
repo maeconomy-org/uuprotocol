@@ -29,8 +29,4 @@ public class ClientUUIDDataSource extends AbstractFirestoreDataSource<ClientUUID
         }
         return clientUUIDList.get(0);
     }
-
-    public List<ClientUUID> findByUUIDList(List<String> uuidList) {
-        return whereIn("uuid", uuidList);
-    }
 }

@@ -2,18 +2,18 @@ package io.recheck.uuidprotocol.nodenetwork.datasource;
 
 import io.recheck.uuidprotocol.common.datasource.AbstractFirestoreDataSource;
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
-import io.recheck.uuidprotocol.nodenetwork.model.audit.AuditCommon;
+import io.recheck.uuidprotocol.nodenetwork.model.audit.Audit;
 import lombok.SneakyThrows;
 
 import java.time.Instant;
 
-public class AuditDataSource<T extends AuditCommon> extends AbstractFirestoreDataSource<T> {
+public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSource<T> {
 
     public AuditDataSource(Class<T> type) {
         super(type);
     }
 
-    public T createOrUpdateAuditCommon(T pojoAuditCommon, String clientCertFingerprint) {
+    public T createOrUpdateAudit(T pojoAuditCommon, String clientCertFingerprint) {
         String documentId = getId(pojoAuditCommon);
         Instant now = Instant.now();
         T existingObject = findByDocumentId(documentId);
@@ -25,8 +25,8 @@ public class AuditDataSource<T extends AuditCommon> extends AbstractFirestoreDat
             pojoAuditCommon.setCreatedAt(existingObject.getCreatedAt());
             pojoAuditCommon.setCreatedBy(existingObject.getCreatedBy());
             pojoAuditCommon.setSoftDeletedAt(existingObject.getSoftDeletedAt());
-            pojoAuditCommon.setSoftDeleteBy(pojoAuditCommon.getSoftDeleteBy());
-            pojoAuditCommon.setSoftDeleted(pojoAuditCommon.getSoftDeleted());
+            pojoAuditCommon.setSoftDeleteBy(existingObject.getSoftDeleteBy());
+            pojoAuditCommon.setSoftDeleted(existingObject.getSoftDeleted());
         }
 
         pojoAuditCommon.setLastUpdatedAt(now);
@@ -35,10 +35,10 @@ public class AuditDataSource<T extends AuditCommon> extends AbstractFirestoreDat
     }
 
     @SneakyThrows
-    public T softDeleteAuditCommon(String documentId, String clientCertFingerprint) {
+    public T softDeleteAudit(String documentId, String clientCertFingerprint) {
         T existingObject = findByDocumentId(documentId);
         if (existingObject == null) {
-            throw new NotFoundException("Object not found for soft delete");
+            throw new NotFoundException("Not found for soft delete");
         }
 
         if (Boolean.FALSE.equals(existingObject.getSoftDeleted())) {

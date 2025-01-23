@@ -1,18 +1,22 @@
 package io.recheck.uuidprotocol.nodenetwork.model;
 
 import io.recheck.uuidprotocol.common.model.FirestoreId;
-import io.recheck.uuidprotocol.nodenetwork.model.audit.AuditCommon;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UUProperty extends AuditCommon {
+public class UUProperty extends Node {
 
     @FirestoreId
-    private String id;
     private String uuid;
+
     private String key;
+
+    private String version;
+
     private String label;
     private String description;
     private String type;
@@ -21,5 +25,7 @@ public class UUProperty extends AuditCommon {
     private int inputOrderPosition;
     private int processingOrderPosition;
     private int viewOrderPosition;
+
+    private List<UUPropertyValue> propertyValues;
 
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 @Data
-public class UUObjectDTO {
+public class UUObjectDTO extends NodeDTO<UUObject> {
 
     @NotNull
     @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
