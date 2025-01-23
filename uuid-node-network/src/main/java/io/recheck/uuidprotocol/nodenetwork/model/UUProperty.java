@@ -1,6 +1,5 @@
 package io.recheck.uuidprotocol.nodenetwork.model;
 
-import io.recheck.uuidprotocol.common.model.FirestoreId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -9,9 +8,6 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UUProperty extends Node {
-
-    @FirestoreId
-    private String uuid;
 
     private String key;
 

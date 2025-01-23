@@ -28,7 +28,7 @@ public class NodeNetworkController<TNode extends Node, TNodeDTO extends NodeDTO<
     public ResponseEntity<Object> readByUUID(@PathVariable
                                                 @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
                                                         String uuid) {
-        return ResponseEntity.ok(dataSource.findByDocumentId(uuid));
+        return ResponseEntity.ok(dataSource.findByUUIDAndSoftDeletedFalse(uuid));
     }
 
     @PostMapping
@@ -39,9 +39,8 @@ public class NodeNetworkController<TNode extends Node, TNodeDTO extends NodeDTO<
 
     @DeleteMapping({"/{uuid}"})
     public ResponseEntity<Object> deleteUUObject(@PathVariable
-                                                 @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-                                                         String uuid,
-                                                 Authentication authentication) {
+                                                     @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+                                                             String uuid, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(nodeNetworkService.softDelete(uuid, user.getUsername()));
     }

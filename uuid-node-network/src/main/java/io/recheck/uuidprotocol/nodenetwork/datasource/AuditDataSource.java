@@ -1,11 +1,13 @@
 package io.recheck.uuidprotocol.nodenetwork.datasource;
 
+import com.google.cloud.firestore.Filter;
 import io.recheck.uuidprotocol.common.datasource.AbstractFirestoreDataSource;
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
 import io.recheck.uuidprotocol.nodenetwork.model.audit.Audit;
 import lombok.SneakyThrows;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSource<T> {
 
@@ -13,25 +15,25 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
         super(type);
     }
 
-    public T createOrUpdateAudit(T pojoAuditCommon, String clientCertFingerprint) {
-        String documentId = getId(pojoAuditCommon);
+    public T createOrUpdateAudit(T pojoAudit, String clientCertFingerprint) {
+        String documentId = getId(pojoAudit);
         Instant now = Instant.now();
         T existingObject = findByDocumentId(documentId);
         if (existingObject == null) {
-            pojoAuditCommon.setCreatedAt(now);
-            pojoAuditCommon.setCreatedBy(clientCertFingerprint);
+            pojoAudit.setCreatedAt(now);
+            pojoAudit.setCreatedBy(clientCertFingerprint);
         }
         else {
-            pojoAuditCommon.setCreatedAt(existingObject.getCreatedAt());
-            pojoAuditCommon.setCreatedBy(existingObject.getCreatedBy());
-            pojoAuditCommon.setSoftDeletedAt(existingObject.getSoftDeletedAt());
-            pojoAuditCommon.setSoftDeleteBy(existingObject.getSoftDeleteBy());
-            pojoAuditCommon.setSoftDeleted(existingObject.getSoftDeleted());
+            pojoAudit.setCreatedAt(existingObject.getCreatedAt());
+            pojoAudit.setCreatedBy(existingObject.getCreatedBy());
+            pojoAudit.setSoftDeletedAt(existingObject.getSoftDeletedAt());
+            pojoAudit.setSoftDeleteBy(existingObject.getSoftDeleteBy());
+            pojoAudit.setSoftDeleted(existingObject.getSoftDeleted());
         }
 
-        pojoAuditCommon.setLastUpdatedAt(now);
-        pojoAuditCommon.setLastUpdatedBy(clientCertFingerprint);
-        return createOrUpdate(pojoAuditCommon);
+        pojoAudit.setLastUpdatedAt(now);
+        pojoAudit.setLastUpdatedBy(clientCertFingerprint);
+        return createOrUpdate(pojoAudit);
     }
 
     @SneakyThrows
@@ -48,6 +50,15 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
         }
 
         return createOrUpdate(existingObject);
+    }
+
+    public T findByUUIDAndSoftDeletedFalse(String uuid) {
+        Filter filter = Filter.and(Filter.equalTo("uuid", uuid), Filter.equalTo("softDeleted", false));
+        Optional<T> firstNodeOptional = where(filter).stream().findFirst();
+        if (firstNodeOptional.isPresent()) {
+            return firstNodeOptional.get();
+        }
+        return null;
     }
 
 

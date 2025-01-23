@@ -3,8 +3,6 @@ package io.recheck.uuidprotocol.nodenetwork.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.recheck.uuidprotocol.nodenetwork.model.UUProperty;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -14,10 +12,6 @@ import java.util.List;
 
 @Data
 public class UUPropertyDTO extends NodeDTO<UUProperty> {
-
-    @NotNull
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-    private String uuid;
 
     @NotBlank
     private String key;

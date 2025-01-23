@@ -4,6 +4,7 @@ import com.google.cloud.firestore.*;
 import io.recheck.uuidprotocol.common.model.FirestoreId;
 import io.recheck.uuidprotocol.common.model.QueryCompositeFilter;
 import io.recheck.uuidprotocol.common.utils.ListUtils;
+import io.recheck.uuidprotocol.common.utils.ReflectionUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -130,24 +132,18 @@ public abstract class AbstractTypeFirestoreDataSource<T_COLLECTION> {
 
     @SneakyThrows
     protected String getId(T_COLLECTION object) {
-        Class<?> clazz = object.getClass();
-        for (Field field : clazz.getDeclaredFields()) {
-            field.setAccessible(true);
-            if (field.isAnnotationPresent(FirestoreId.class)) {
-                return (String) field.get(object);
-            }
+        Optional<Field> idFieldOptional = ReflectionUtils.findAnnotationPresent(FirestoreId.class, object.getClass());
+        if (idFieldOptional.isPresent()) {
+            return (String) idFieldOptional.get().get(object);
         }
         return null;
     }
 
     @SneakyThrows
     protected void setId(T_COLLECTION object, String id) {
-        Class<?> clazz = object.getClass();
-        for (Field field : clazz.getDeclaredFields()) {
-            field.setAccessible(true);
-            if (field.isAnnotationPresent(FirestoreId.class)) {
-                field.set(object, id);
-            }
+        Optional<Field> idFieldOptional = ReflectionUtils.findAnnotationPresent(FirestoreId.class, object.getClass());
+        if (idFieldOptional.isPresent()) {
+            idFieldOptional.get().set(object, id);
         }
     }
 

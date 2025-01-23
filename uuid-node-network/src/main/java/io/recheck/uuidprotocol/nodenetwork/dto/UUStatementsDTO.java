@@ -11,8 +11,6 @@ import org.springframework.beans.BeanUtils;
 @Data
 public class UUStatementsDTO {
 
-    private String id;
-
     @NotBlank
     @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
     private String subject;
