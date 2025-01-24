@@ -11,6 +11,9 @@ import io.recheck.uuidprotocol.nodenetwork.model.UUStatements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UUStatementsService {
@@ -21,9 +24,21 @@ public class UUStatementsService {
     private final UUPropertyDataSource uuPropertyDataSource;
     private final UUObjectDataSource uuObjectDataSource;
 
-    public UUStatements createOrUpdate(UUStatementsDTO uuStatementsDTO, String clientCertFingerprint) {
+    public List<UUStatements> create(List<UUStatementsDTO> uuStatementsDTOList, String clientCertFingerprint) {
+        List<UUStatements> uuStatementsList = new ArrayList<>();
+        for (UUStatementsDTO uuStatementsDTO : uuStatementsDTOList) {
+            uuStatementsList.add(findOrCreate(uuStatementsDTO, clientCertFingerprint));
+        }
+        return uuStatementsList;
+    }
+
+    public UUStatements findOrCreate(UUStatementsDTO uuStatementsDTO, String clientCertFingerprint) {
         validateCreateOrUpdate(uuStatementsDTO, clientCertFingerprint);
-        return uuStatementsDataSource.createOrUpdateAudit(uuStatementsDTO.build(), clientCertFingerprint);
+        UUStatements existingUUStatement = uuStatementsDataSource.find(uuStatementsDTO.getSubject(), uuStatementsDTO.getPredicate().name(), uuStatementsDTO.getObject());
+        if (existingUUStatement == null) {
+            return uuStatementsDataSource.createOrUpdateAudit(uuStatementsDTO.build(), clientCertFingerprint);
+        }
+        return existingUUStatement;
     }
 
     public UUStatements softDelete(String statementsId, String clientCertFingerprint) {
@@ -35,27 +50,30 @@ public class UUStatementsService {
         clientUUIDService.validateClientUUID(clientCertFingerprint, uuStatementsDTO.getObject());
         clientUUIDService.validateClientUUID(clientCertFingerprint, uuStatementsDTO.getSubject());
 
+        //if predicate is IS_PROPERTY_OF or HAS_PROPERTY the allowed relations are between only UUObject with UUProperty
+        //for that there is validation
         if (uuStatementsDTO.getPredicate().equals(UUStatementPredicate.IS_PROPERTY_OF)) {
-            if (uuPropertyDataSource.findByDocumentId(uuStatementsDTO.getSubject()) == null) {
+            if (uuPropertyDataSource.findByUUIDAndSoftDeletedFalse(uuStatementsDTO.getSubject()) == null) {
                 throw new NotFoundException("Statement subject Property not found with uuid=" + uuStatementsDTO.getSubject());
             }
-            if (uuObjectDataSource.findByDocumentId(uuStatementsDTO.getObject()) == null) {
+            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementsDTO.getObject()) == null) {
                 throw new NotFoundException("Statement object UUObject not found with uuid=" + uuStatementsDTO.getObject());
             }
         }
         else if (uuStatementsDTO.getPredicate().equals(UUStatementPredicate.HAS_PROPERTY)) {
-            if (uuPropertyDataSource.findByDocumentId(uuStatementsDTO.getObject()) == null) {
+            if (uuPropertyDataSource.findByUUIDAndSoftDeletedFalse(uuStatementsDTO.getObject()) == null) {
                 throw new NotFoundException("Statement object Property not found with uuid=" + uuStatementsDTO.getObject());
             }
-            if (uuObjectDataSource.findByDocumentId(uuStatementsDTO.getSubject()) == null) {
+            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementsDTO.getSubject()) == null) {
                 throw new NotFoundException("Statement subject UUObject not found with uuid=" + uuStatementsDTO.getSubject());
             }
         }
         else {
-            if (uuObjectDataSource.findByDocumentId(uuStatementsDTO.getSubject()) == null) {
+            // else both must be UUObject
+            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementsDTO.getSubject()) == null) {
                 throw new NotFoundException("Statement subject UUObject not found with uuid=" + uuStatementsDTO.getSubject());
             }
-            if (uuObjectDataSource.findByDocumentId(uuStatementsDTO.getObject()) == null) {
+            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementsDTO.getObject()) == null) {
                 throw new NotFoundException("Statement object UUObject not found with uuid=" + uuStatementsDTO.getObject());
             }
         }

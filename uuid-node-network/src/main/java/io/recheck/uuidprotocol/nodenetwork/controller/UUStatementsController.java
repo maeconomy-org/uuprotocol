@@ -3,7 +3,6 @@ package io.recheck.uuidprotocol.nodenetwork.controller;
 import io.recheck.uuidprotocol.nodenetwork.datasource.UUStatementsDataSource;
 import io.recheck.uuidprotocol.nodenetwork.dto.UUStatementsDTO;
 import io.recheck.uuidprotocol.nodenetwork.model.UUStatementPredicate;
-import io.recheck.uuidprotocol.nodenetwork.model.UUStatements;
 import io.recheck.uuidprotocol.nodenetwork.service.UUStatementsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -14,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,11 +26,7 @@ public class UUStatementsController {
     @PostMapping
     public ResponseEntity<Object> createOrUpdateStatements(@Valid @RequestBody @NotEmpty List<UUStatementsDTO> uuStatementsDTOList, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        List<UUStatements> uuStatementsList = new ArrayList<>();
-        for (UUStatementsDTO uuStatementsDTO : uuStatementsDTOList) {
-            uuStatementsList.add(uuStatementsService.createOrUpdate(uuStatementsDTO, user.getUsername()));
-        }
-        return ResponseEntity.ok(uuStatementsList);
+        return ResponseEntity.ok(uuStatementsService.create(uuStatementsDTOList, user.getUsername()));
     }
 
     @DeleteMapping({"/{statementsId}"})

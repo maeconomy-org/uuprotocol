@@ -43,7 +43,7 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
             throw new NotFoundException("Not found for soft delete");
         }
 
-        if (Boolean.FALSE.equals(existingObject.getSoftDeleted())) {
+        if (!existingObject.getSoftDeleted()) {
             existingObject.setSoftDeleted(true);
             existingObject.setSoftDeleteBy(clientCertFingerprint);
             existingObject.setSoftDeletedAt(Instant.now());
@@ -55,10 +55,7 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
     public T findByUUIDAndSoftDeletedFalse(String uuid) {
         Filter filter = Filter.and(Filter.equalTo("uuid", uuid), Filter.equalTo("softDeleted", false));
         Optional<T> firstNodeOptional = where(filter).stream().findFirst();
-        if (firstNodeOptional.isPresent()) {
-            return firstNodeOptional.get();
-        }
-        return null;
+        return firstNodeOptional.orElse(null);
     }
 
 
