@@ -2,7 +2,7 @@ package io.recheck.uuidprotocol.common.datasource;
 
 import com.google.cloud.firestore.FieldPath;
 import com.google.cloud.firestore.Filter;
-import io.recheck.uuidprotocol.common.model.QueryCompositeFilter;
+import io.recheck.uuidprotocol.common.querybuilder.model.QueryCompositeFilter;
 
 import java.util.List;
 

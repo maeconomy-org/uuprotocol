@@ -1,8 +1,8 @@
 package io.recheck.uuidprotocol.nodenetwork.controller;
 
-import io.recheck.uuidprotocol.nodenetwork.datasource.UUStatementsDataSource;
-import io.recheck.uuidprotocol.nodenetwork.dto.UUStatementDTO;
-import io.recheck.uuidprotocol.nodenetwork.model.UUStatementPredicate;
+import io.recheck.uuidprotocol.domain.node.datasource.UUStatementsDataSource;
+import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
+import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
 import io.recheck.uuidprotocol.nodenetwork.service.UUStatementsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

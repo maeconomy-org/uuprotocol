@@ -1,8 +1,9 @@
 package io.recheck.uuidprotocol.common.datasource;
 
 import com.google.cloud.firestore.*;
-import io.recheck.uuidprotocol.common.model.FirestoreId;
-import io.recheck.uuidprotocol.common.model.QueryCompositeFilter;
+import io.recheck.uuidprotocol.common.datasource.model.FirestoreId;
+import io.recheck.uuidprotocol.common.querybuilder.QueryBuilder;
+import io.recheck.uuidprotocol.common.querybuilder.model.QueryCompositeFilter;
 import io.recheck.uuidprotocol.common.utils.ListUtils;
 import io.recheck.uuidprotocol.common.utils.ReflectionUtils;
 import lombok.Getter;

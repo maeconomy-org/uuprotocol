@@ -1,6 +1,6 @@
 package io.recheck.uuidprotocol.uuidservice;
 
-import io.recheck.uuidprotocol.common.security.service.ClientUUIDService;
+import io.recheck.uuidprotocol.domain.uuidowner.OwnerUUIDService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,23 +13,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UUIDServiceController {
 
-    private final ClientUUIDService clientUUIDService;
+    private final OwnerUUIDService ownerUUIDService;
 
     @PostMapping("/uuid")
     public ResponseEntity<Object> createUUID(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(clientUUIDService.createUUID(user.getUsername()));
+        return ResponseEntity.ok(ownerUUIDService.createUUID(user.getUsername()));
     }
 
     @GetMapping({"/uuid"})
     public ResponseEntity<Object> read() {
-        return ResponseEntity.ok(clientUUIDService.findAllCastUUIDDTO());
+        return ResponseEntity.ok(ownerUUIDService.findAllCastUUIDDTO());
     }
 
     @GetMapping({"/me/uuid"})
     public ResponseEntity<Object> readOwn(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(clientUUIDService.findByClientCastUUIDDTO(user.getUsername()));
+        return ResponseEntity.ok(ownerUUIDService.findByOwnerCastUUIDDTO(user.getUsername()));
     }
 
 }

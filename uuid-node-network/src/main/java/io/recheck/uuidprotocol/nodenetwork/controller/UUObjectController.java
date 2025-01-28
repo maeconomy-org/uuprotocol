@@ -1,8 +1,8 @@
 package io.recheck.uuidprotocol.nodenetwork.controller;
 
-import io.recheck.uuidprotocol.nodenetwork.datasource.UUObjectDataSource;
-import io.recheck.uuidprotocol.nodenetwork.dto.UUObjectDTO;
-import io.recheck.uuidprotocol.nodenetwork.model.UUObject;
+import io.recheck.uuidprotocol.domain.node.datasource.UUObjectDataSource;
+import io.recheck.uuidprotocol.domain.node.dto.UUObjectDTO;
+import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import io.recheck.uuidprotocol.nodenetwork.service.NodeNetworkService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

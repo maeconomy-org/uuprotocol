@@ -1,38 +1,38 @@
 package io.recheck.uuidprotocol.nodenetwork.service;
 
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
-import io.recheck.uuidprotocol.common.security.service.ClientUUIDService;
-import io.recheck.uuidprotocol.nodenetwork.datasource.AuditDataSource;
-import io.recheck.uuidprotocol.nodenetwork.dto.NodeDTO;
-import io.recheck.uuidprotocol.nodenetwork.model.Node;
+import io.recheck.uuidprotocol.domain.node.datasource.AuditDataSource;
+import io.recheck.uuidprotocol.domain.node.dto.NodeDTO;
+import io.recheck.uuidprotocol.domain.node.model.Node;
+import io.recheck.uuidprotocol.domain.uuidowner.OwnerUUIDService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNode>> {
 
     private final AuditDataSource<TNode> dataSource;
-    private final ClientUUIDService clientUUIDService;
+    private final OwnerUUIDService ownerUUIDService;
 
-    public TNode createOrUpdate(TNodeDTO dto, String clientCertFingerprint) {
-        clientUUIDService.validateClientUUID(clientCertFingerprint, dto.getUuid());
+    public TNode createOrUpdate(TNodeDTO dto, String ownerCertFingerprint) {
+        ownerUUIDService.validateOwnerUUID(ownerCertFingerprint, dto.getUuid());
 
         TNode existingUUIDNode = dataSource.findByUUIDAndSoftDeletedFalse(dto.getUuid());
         if (existingUUIDNode != null) {
-            dataSource.softDeleteAudit(existingUUIDNode.getId(), clientCertFingerprint);
+            dataSource.softDeleteAudit(existingUUIDNode.getId(), ownerCertFingerprint);
         }
 
-        return dataSource.createOrUpdateAudit(dto.build(), clientCertFingerprint);
+        return dataSource.createOrUpdateAudit(dto.build(), ownerCertFingerprint);
     }
 
-    public TNode softDelete(String uuid, String clientCertFingerprint) {
-        clientUUIDService.validateClientUUID(clientCertFingerprint, uuid);
+    public TNode softDelete(String uuid, String ownerCertFingerprint) {
+        ownerUUIDService.validateOwnerUUID(ownerCertFingerprint, uuid);
 
         TNode existingUUIDNode = dataSource.findByUUIDAndSoftDeletedFalse(uuid);
         if (existingUUIDNode == null) {
             throw new NotFoundException("Not found for soft delete");
         }
 
-        return dataSource.softDeleteAudit(existingUUIDNode.getId(), clientCertFingerprint);
+        return dataSource.softDeleteAudit(existingUUIDNode.getId(), ownerCertFingerprint);
     }
 
 }
