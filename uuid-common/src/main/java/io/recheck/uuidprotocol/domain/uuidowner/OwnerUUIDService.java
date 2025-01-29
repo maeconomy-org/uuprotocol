@@ -14,26 +14,18 @@ public class OwnerUUIDService {
 
     private final OwnerUUIDDataSource ownerUUIDDataSource;
 
-    public OwnerUUIDDTO createUUID(String ownerCertFingerprint) {
+    public OwnerUUID createUUID(String ownerCertFingerprint) {
         String uuid = UUID.randomUUID().toString();
         ownerUUIDDataSource.createOrUpdate(new OwnerUUID(uuid, ownerCertFingerprint));
-        return new OwnerUUIDDTO(uuid);
+        return new OwnerUUID(uuid);
     }
 
     public List<OwnerUUID> findAll() {
         return ownerUUIDDataSource.findAll();
     }
 
-    public List<OwnerUUIDDTO> findAllCastUUIDDTO() {
-        return ownerUUIDDataSource.findAll(OwnerUUIDDTO.class);
-    }
-
     public List<OwnerUUID> findByOwner(String ownerCertFingerprint) {
         return ownerUUIDDataSource.findByOwnerCertFingerprint(ownerCertFingerprint);
-    }
-
-    public List<OwnerUUIDDTO> findByOwnerCastUUIDDTO(String ownerCertFingerprint) {
-        return ownerUUIDDataSource.findByOwnerCertFingerprintCastUUIDDTO(ownerCertFingerprint);
     }
 
     public void validateOwnerUUID(String ownerCertFingerprint, String uuid) {

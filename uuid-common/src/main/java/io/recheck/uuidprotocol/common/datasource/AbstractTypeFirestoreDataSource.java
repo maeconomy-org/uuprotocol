@@ -1,6 +1,7 @@
 package io.recheck.uuidprotocol.common.datasource;
 
 import com.google.cloud.firestore.*;
+import com.google.firestore.v1.StructuredQuery;
 import io.recheck.uuidprotocol.common.datasource.model.FirestoreId;
 import io.recheck.uuidprotocol.common.querybuilder.QueryBuilder;
 import io.recheck.uuidprotocol.common.querybuilder.model.QueryCompositeFilter;
@@ -102,6 +103,38 @@ public abstract class AbstractTypeFirestoreDataSource<T_COLLECTION> {
     @SneakyThrows
     public <T_CAST> List<T_CAST> where(Filter filter, Class<T_CAST> castType) {
         return documentSnapshotToObjects(firestore.collection(type.getSimpleName()).where(filter).get().get().getDocuments(), castType);
+    }
+
+    public <T_CAST> List<T_CAST> whereAndFiltersOrFindAll(List<Filter> filters, Class<T_CAST> castType) {
+        return whereOrFindAll(filters, StructuredQuery.CompositeFilter.Operator.AND, castType);
+    }
+
+    public <T_CAST> List<T_CAST> whereOrFindAll(List<Filter> filters, StructuredQuery.CompositeFilter.Operator operator, Class<T_CAST> castType) {
+        if (filters.isEmpty()) {
+            return findAll(castType);
+        }
+        else {
+            return where(filters, operator, castType);
+        }
+    }
+
+    @SneakyThrows
+    public <T_CAST> List<T_CAST> where(List<Filter> filters, StructuredQuery.CompositeFilter.Operator operator, Class<T_CAST> castType) {
+        Filter filter;
+        switch (operator) {
+            case AND -> {
+                filter = Filter.and(filters.toArray(new Filter[0]));
+                break;
+            }
+            case OR -> {
+                filter = Filter.or(filters.toArray(new Filter[0]));
+                break;
+            }
+            default -> {
+                throw new Exception("StructuredQuery.CompositeFilter.Operator not found");
+            }
+        }
+        return where(filter, castType);
     }
 
     protected <T_CAST> List<T_CAST> documentSnapshotToObjects(Iterable<QueryDocumentSnapshot> queryDocumentSnapshots, Class<T_CAST> castType) {

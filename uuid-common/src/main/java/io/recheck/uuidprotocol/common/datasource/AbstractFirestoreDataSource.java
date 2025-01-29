@@ -48,5 +48,8 @@ public abstract class AbstractFirestoreDataSource<T_COLLECTION> extends Abstract
         return super.where(filter, super.getType());
     }
 
+    public List<T_COLLECTION> whereAndFiltersOrFindAll(List<Filter> filters) {
+        return super.whereAndFiltersOrFindAll(filters, super.getType());
+    }
 
 }

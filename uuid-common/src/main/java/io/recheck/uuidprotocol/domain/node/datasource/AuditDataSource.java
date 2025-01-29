@@ -2,12 +2,12 @@ package io.recheck.uuidprotocol.domain.node.datasource;
 
 import com.google.cloud.firestore.Filter;
 import io.recheck.uuidprotocol.common.datasource.AbstractFirestoreDataSource;
-import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
 import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
-import lombok.SneakyThrows;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSource<T> {
 
@@ -36,13 +36,7 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
         return createOrUpdate(pojoAudit);
     }
 
-    @SneakyThrows
-    public T softDeleteAudit(String documentId, String ownerCertFingerprint) {
-        T existingObject = findByDocumentId(documentId);
-        if (existingObject == null) {
-            throw new NotFoundException("Not found for soft delete");
-        }
-
+    public T softDeleteAudit(T existingObject, String ownerCertFingerprint) {
         if (!existingObject.getSoftDeleted()) {
             existingObject.setSoftDeleted(true);
             existingObject.setSoftDeleteBy(ownerCertFingerprint);
@@ -52,10 +46,19 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
         return createOrUpdate(existingObject);
     }
 
-    public T findByUUIDAndSoftDeletedFalse(String uuid) {
-        Filter filter = Filter.and(Filter.equalTo("uuid", uuid), Filter.equalTo("softDeleted", false));
-        Optional<T> firstNodeOptional = where(filter).stream().findFirst();
-        return firstNodeOptional.orElse(null);
+    public List<T> findByOrFindAll(String createdBy, Boolean softDeleted) {
+        return whereAndFiltersOrFindAll(filtersBy(createdBy, softDeleted));
+    }
+
+    protected List<Filter> filtersBy(String createdBy, Boolean softDeleted) {
+        List<Filter> filters = new ArrayList<>();
+        if (StringUtils.hasText(createdBy)) {
+            filters.add(Filter.equalTo("createdBy", createdBy));
+        }
+        if (softDeleted != null) {
+            filters.add(Filter.equalTo("softDeleted", softDeleted));
+        }
+        return filters;
     }
 
 

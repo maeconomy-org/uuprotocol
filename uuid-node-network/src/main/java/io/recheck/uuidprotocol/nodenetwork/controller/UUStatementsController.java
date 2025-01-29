@@ -24,13 +24,13 @@ public class UUStatementsController {
     private final UUStatementsDataSource uuStatementsDataSource;
 
     @PostMapping
-    public ResponseEntity<Object> createOrUpdateStatements(@Valid @RequestBody @NotEmpty List<UUStatementDTO> uuStatementDTOList, Authentication authentication) {
+    public ResponseEntity<Object> findOrCreate(@Valid @RequestBody @NotEmpty List<UUStatementDTO> uuStatementDTOList, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuStatementsService.create(uuStatementDTOList, user.getUsername()));
+        return ResponseEntity.ok(uuStatementsService.findOrCreate(uuStatementDTOList, user.getUsername()));
     }
 
     @DeleteMapping({"/{subject}/{predicate}/{object}"})
-    public ResponseEntity<Object> deleteUUStatements(@PathVariable
+    public ResponseEntity<Object> softDelete(@PathVariable
                                                          @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
                                                                  String subject,
                                                      @PathVariable UUStatementPredicate predicate,
@@ -43,8 +43,14 @@ public class UUStatementsController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> readAll() {
-        return ResponseEntity.ok(uuStatementsDataSource.findAll());
+    public ResponseEntity<Object> findBySoftDeleted(@RequestParam(required = false) Boolean softDeleted) {
+        return ResponseEntity.ok(uuStatementsDataSource.findByOrFindAll(null, softDeleted));
+    }
+
+    @GetMapping({"/own"})
+    public ResponseEntity<Object> findBySoftDeletedOwn(@RequestParam(required = false) Boolean softDeleted, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(uuStatementsDataSource.findByOrFindAll(user.getUsername(), softDeleted));
     }
 
     @GetMapping({"/{predicate}"})

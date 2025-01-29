@@ -16,10 +16,6 @@ public class OwnerUUIDDataSource extends AbstractFirestoreDataSource<OwnerUUID> 
         return whereEqualTo("ownerCertFingerprint", ownerCertFingerprint);
     }
 
-    public List<OwnerUUIDDTO> findByOwnerCertFingerprintCastUUIDDTO(String ownerCertFingerprint) {
-        return whereEqualTo("ownerCertFingerprint", ownerCertFingerprint, OwnerUUIDDTO.class);
-    }
-
     public OwnerUUID findByUUID(String uuid) {
         List<OwnerUUID> ownerUUIDList = whereEqualTo("uuid", uuid);
         if (ownerUUIDList.isEmpty()) {

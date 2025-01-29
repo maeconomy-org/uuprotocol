@@ -2,15 +2,19 @@ package io.recheck.uuidprotocol.common.querybuilder.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.firestore.v1.StructuredQuery;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class QueryCompositeFilterDTO {
 
-    enum CompositeOperator {
+    public enum CompositeOperator {
         OR("OR"),
         AND("AND");
 
@@ -23,15 +27,6 @@ public class QueryCompositeFilterDTO {
         public String getText() {
             return this.text;
         }
-
-        public static CompositeOperator fromString(String text) {
-            for (CompositeOperator b : CompositeOperator.values()) {
-                if (b.text.equalsIgnoreCase(text)) {
-                    return b;
-                }
-            }
-            return null;
-        }
     }
 
     private CompositeOperator compositeOperator;
@@ -41,6 +36,11 @@ public class QueryCompositeFilterDTO {
 
     @JsonProperty("queryCompositeFilters")
     private List<QueryCompositeFilterDTO> queryCompositeFiltersDTO;
+
+    public QueryCompositeFilterDTO(CompositeOperator compositeOperator, List<QueryUnaryFilterDTO> queryUnaryFiltersDTO) {
+        this.compositeOperator = compositeOperator;
+        this.queryUnaryFiltersDTO = queryUnaryFiltersDTO;
+    }
 
     public QueryCompositeFilter build() {
         QueryCompositeFilter queryCompositeFilter = new QueryCompositeFilter();

@@ -5,13 +5,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class QueryUnaryFilterDTO {
-    enum UnaryOperator {
+
+    public enum UnaryOperator {
         EQUAL("EQUAL"),
         NOT_EQUAL("NOT_EQUAL"),
         GREATER_THAN("GREATER_THAN"),
@@ -31,15 +36,6 @@ public class QueryUnaryFilterDTO {
 
         public String getText() {
             return this.text;
-        }
-
-        public static UnaryOperator fromString(String text) {
-            for (UnaryOperator b : UnaryOperator.values()) {
-                if (b.text.equalsIgnoreCase(text)) {
-                    return b;
-                }
-            }
-            return null;
         }
     }
 
