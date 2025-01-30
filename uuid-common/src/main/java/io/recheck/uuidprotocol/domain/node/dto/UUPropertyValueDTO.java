@@ -2,17 +2,20 @@ package io.recheck.uuidprotocol.domain.node.dto;
 
 
 import io.recheck.uuidprotocol.domain.node.model.UUPropertyValue;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
+
+import java.util.List;
 
 @Data
 public class UUPropertyValueDTO {
 
-    @NotBlank
     private String value;
 
+    private List<String> uuFilesUUID;
+
     private String valueTypeCast;
+
     private String sourceType;
 
     public UUPropertyValue build() {

@@ -1,6 +1,7 @@
 package io.recheck.uuidprotocol.nodenetwork.service;
 
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
+import io.recheck.uuidprotocol.domain.node.datasource.UUFilesDataSource;
 import io.recheck.uuidprotocol.domain.node.datasource.UUObjectDataSource;
 import io.recheck.uuidprotocol.domain.node.datasource.UUPropertyDataSource;
 import io.recheck.uuidprotocol.domain.node.datasource.UUStatementsDataSource;
@@ -25,6 +26,7 @@ public class UUStatementsService {
     private final UUStatementsDataSource uuStatementsDataSource;
     private final UUPropertyDataSource uuPropertyDataSource;
     private final UUObjectDataSource uuObjectDataSource;
+    private final UUFilesDataSource uuFilesDataSource;
 
 
 
@@ -93,6 +95,19 @@ public class UUStatementsService {
                 throw new NotFoundException("Statement subject UUObject not found with uuid=" + uuStatementDTO.getSubject());
             }
         }
+
+        else if (uuStatementDTO.getPredicate().equals(UUStatementPredicate.IS_FILE_OF)) {
+            if (uuFilesDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getSubject()) == null) {
+                throw new NotFoundException("Statement subject File not found with uuid=" + uuStatementDTO.getSubject());
+            }
+        }
+        else if (uuStatementDTO.getPredicate().equals(UUStatementPredicate.HAS_FILE)) {
+            if (uuFilesDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getObject()) == null) {
+                throw new NotFoundException("Statement object File not found with uuid=" + uuStatementDTO.getObject());
+            }
+        }
+
+
         else {
             // else both must be UUObject
             if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getSubject()) == null) {

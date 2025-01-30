@@ -7,7 +7,8 @@ public enum UUStatementPredicate {
     IS_PARENT_OF("isParentOf"), IS_CHILD_OF("isChildOf"),
     IS_INPUT_OF("isInputOf"), IS_OUTPUT_OF("isOutputOf"),
     IS_MODEL_OF("isModelOf"), IS_INSTANCE_MODEL_OF("isInstanceModelOf"),
-    IS_PROPERTY_OF("isPropertyOf"), HAS_PROPERTY("hasProperty");
+    IS_PROPERTY_OF("isPropertyOf"), HAS_PROPERTY("hasProperty"),
+    IS_FILE_OF("isFileOf"), HAS_FILE("hasFile");
 
     private static Map<UUStatementPredicate, UUStatementPredicate> oppositePredicateOf = Map.of(
             UUStatementPredicate.IS_PARENT_OF, UUStatementPredicate.IS_CHILD_OF,
@@ -20,7 +21,10 @@ public enum UUStatementPredicate {
             UUStatementPredicate.IS_INSTANCE_MODEL_OF, UUStatementPredicate.IS_MODEL_OF,
 
             UUStatementPredicate.IS_PROPERTY_OF, UUStatementPredicate.HAS_PROPERTY,
-            UUStatementPredicate.HAS_PROPERTY, UUStatementPredicate.IS_PROPERTY_OF
+            UUStatementPredicate.HAS_PROPERTY, UUStatementPredicate.IS_PROPERTY_OF,
+
+            UUStatementPredicate.IS_FILE_OF, UUStatementPredicate.HAS_FILE,
+            UUStatementPredicate.HAS_FILE, UUStatementPredicate.IS_FILE_OF
     );
 
     private String text;
