@@ -3,8 +3,6 @@ package io.recheck.uuidprotocol.domain.node.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UUProperty extends Node {
@@ -21,7 +19,5 @@ public class UUProperty extends Node {
     private int inputOrderPosition;
     private int processingOrderPosition;
     private int viewOrderPosition;
-
-    private List<UUPropertyValue> propertyValues;
 
 }

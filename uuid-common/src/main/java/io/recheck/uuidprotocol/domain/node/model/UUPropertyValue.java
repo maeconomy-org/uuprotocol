@@ -1,14 +1,13 @@
 package io.recheck.uuidprotocol.domain.node.model;
 
 import lombok.Data;
-
-import java.util.List;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class UUPropertyValue {
+@EqualsAndHashCode(callSuper = true)
+public class UUPropertyValue extends Node {
 
     private String value;
-    private List<String> uuFilesUUID;
 
     private String valueTypeCast;
 

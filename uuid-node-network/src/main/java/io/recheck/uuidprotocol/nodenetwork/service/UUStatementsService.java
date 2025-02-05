@@ -1,12 +1,7 @@
 package io.recheck.uuidprotocol.nodenetwork.service;
 
-import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
-import io.recheck.uuidprotocol.domain.node.datasource.UUFilesDataSource;
-import io.recheck.uuidprotocol.domain.node.datasource.UUObjectDataSource;
-import io.recheck.uuidprotocol.domain.node.datasource.UUPropertyDataSource;
 import io.recheck.uuidprotocol.domain.node.datasource.UUStatementsDataSource;
 import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
-import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
 import io.recheck.uuidprotocol.domain.node.model.UUStatements;
 import io.recheck.uuidprotocol.domain.uuidowner.OwnerUUIDService;
 import lombok.RequiredArgsConstructor;
@@ -22,24 +17,21 @@ import java.util.Set;
 public class UUStatementsService {
 
     private final OwnerUUIDService ownerUUIDService;
-
     private final UUStatementsDataSource uuStatementsDataSource;
-    private final UUPropertyDataSource uuPropertyDataSource;
-    private final UUObjectDataSource uuObjectDataSource;
-    private final UUFilesDataSource uuFilesDataSource;
-
+    private final UUStatementPredicateService uuStatementPredicateService;
 
 
     public UUStatementDTO buildOpposite(UUStatementDTO uuStatementDTO) {
         return new UUStatementDTO(uuStatementDTO.getObject(), uuStatementDTO.getPredicate().getOpposite(uuStatementDTO.getPredicate()), uuStatementDTO.getSubject());
     }
 
-    public HashSet<UUStatements> findOrCreate(List<UUStatementDTO> uuStatementDTOList, String ownerCertFingerprint) {
+    public Set<UUStatements> findOrCreate(List<UUStatementDTO> uuStatementDTOList, String ownerCertFingerprint) {
         Set<UUStatementDTO> uuStatementsSet = new HashSet<>(uuStatementDTOList);
 
         List<UUStatements> uuStatementsList = new ArrayList<>();
         for (UUStatementDTO uuStatementDTO : uuStatementsSet) {
-            validateFindOrCreate(uuStatementDTO, ownerCertFingerprint);
+            validateOwnerUUID(uuStatementDTO, ownerCertFingerprint);
+            uuStatementPredicateService.validateStatement(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate(), uuStatementDTO.getObject());
             uuStatementsList.add(findOrCreate(uuStatementDTO, ownerCertFingerprint));
             uuStatementsList.add(findOrCreate(buildOpposite(uuStatementDTO), ownerCertFingerprint));
         }
@@ -55,7 +47,7 @@ public class UUStatementsService {
     }
 
     public List<UUStatements> softDelete(UUStatementDTO uuStatementDTO, String ownerCertFingerprint) {
-        validateownerUUID(uuStatementDTO, ownerCertFingerprint);
+        validateOwnerUUID(uuStatementDTO, ownerCertFingerprint);
         UUStatements existingUUStatement = find(uuStatementDTO);
         UUStatements existingOppositeUUStatement = find(buildOpposite(uuStatementDTO));
 
@@ -74,52 +66,7 @@ public class UUStatementsService {
         return uuStatementsDataSource.find(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate().name(), uuStatementDTO.getObject());
     }
 
-    public void validateFindOrCreate(UUStatementDTO uuStatementDTO, String ownerCertFingerprint) {
-        validateownerUUID(uuStatementDTO, ownerCertFingerprint);
-
-        //if predicate is IS_PROPERTY_OF or HAS_PROPERTY the allowed relations are between only UUObject with UUProperty
-        //for that there is validation
-        if (uuStatementDTO.getPredicate().equals(UUStatementPredicate.IS_PROPERTY_OF)) {
-            if (uuPropertyDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getSubject()) == null) {
-                throw new NotFoundException("Statement subject Property not found with uuid=" + uuStatementDTO.getSubject());
-            }
-            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getObject()) == null) {
-                throw new NotFoundException("Statement object UUObject not found with uuid=" + uuStatementDTO.getObject());
-            }
-        }
-        else if (uuStatementDTO.getPredicate().equals(UUStatementPredicate.HAS_PROPERTY)) {
-            if (uuPropertyDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getObject()) == null) {
-                throw new NotFoundException("Statement object Property not found with uuid=" + uuStatementDTO.getObject());
-            }
-            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getSubject()) == null) {
-                throw new NotFoundException("Statement subject UUObject not found with uuid=" + uuStatementDTO.getSubject());
-            }
-        }
-
-        else if (uuStatementDTO.getPredicate().equals(UUStatementPredicate.IS_FILE_OF)) {
-            if (uuFilesDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getSubject()) == null) {
-                throw new NotFoundException("Statement subject File not found with uuid=" + uuStatementDTO.getSubject());
-            }
-        }
-        else if (uuStatementDTO.getPredicate().equals(UUStatementPredicate.HAS_FILE)) {
-            if (uuFilesDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getObject()) == null) {
-                throw new NotFoundException("Statement object File not found with uuid=" + uuStatementDTO.getObject());
-            }
-        }
-
-
-        else {
-            // else both must be UUObject
-            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getSubject()) == null) {
-                throw new NotFoundException("Statement subject UUObject not found with uuid=" + uuStatementDTO.getSubject());
-            }
-            if (uuObjectDataSource.findByUUIDAndSoftDeletedFalse(uuStatementDTO.getObject()) == null) {
-                throw new NotFoundException("Statement object UUObject not found with uuid=" + uuStatementDTO.getObject());
-            }
-        }
-    }
-
-    public void validateownerUUID(UUStatementDTO uuStatementDTO, String ownerCertFingerprint) {
+    public void validateOwnerUUID(UUStatementDTO uuStatementDTO, String ownerCertFingerprint) {
         ownerUUIDService.validateOwnerUUID(ownerCertFingerprint, uuStatementDTO.getObject());
         ownerUUIDService.validateOwnerUUID(ownerCertFingerprint, uuStatementDTO.getSubject());
     }

@@ -13,6 +13,16 @@ public class NodeDataSource<T extends Node> extends AuditDataSource<T> {
         super(type);
     }
 
+    public T findByUUID(String uuid) {
+        Filter filter = Filter.equalTo("uuid", uuid);
+        Optional<T> firstNodeOptional = where(filter).stream().findFirst();
+        return firstNodeOptional.orElse(null);
+    }
+
+    public boolean exist(String uuid) {
+        return findByUUID(uuid) != null;
+    }
+
     public T findByUUIDAndSoftDeletedFalse(String uuid) {
         Filter filter = Filter.and(Filter.equalTo("uuid", uuid), Filter.equalTo("softDeleted", false));
         Optional<T> firstNodeOptional = where(filter).stream().findFirst();

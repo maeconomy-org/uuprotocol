@@ -1,15 +1,10 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.recheck.uuidprotocol.domain.node.model.UUProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -29,21 +24,10 @@ public class UUPropertyDTO extends NodeDTO<UUProperty> {
     private int processingOrderPosition;
     private int viewOrderPosition;
 
-    @JsonProperty("propertyValues")
-    private List<UUPropertyValueDTO> propertyValuesDTO;
-
 
     public UUProperty build() {
         UUProperty uuProperty = new UUProperty();
         BeanUtils.copyProperties(this, uuProperty);
-
-        if (propertyValuesDTO != null && !propertyValuesDTO.isEmpty()) {
-            uuProperty.setPropertyValues(new ArrayList<>());
-            for (UUPropertyValueDTO uuPropertyValueDTO : propertyValuesDTO) {
-                uuProperty.getPropertyValues().add(uuPropertyValueDTO.build());
-            }
-        }
-
         return uuProperty;
     }
 

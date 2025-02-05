@@ -3,16 +3,14 @@ package io.recheck.uuidprotocol.domain.node.dto;
 
 import io.recheck.uuidprotocol.domain.node.model.UUPropertyValue;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;
 
-import java.util.List;
-
 @Data
-public class UUPropertyValueDTO {
+@EqualsAndHashCode(callSuper=false)
+public class UUPropertyValueDTO extends NodeDTO<UUPropertyValue> {
 
     private String value;
-
-    private List<String> uuFilesUUID;
 
     private String valueTypeCast;
 
