@@ -37,16 +37,6 @@ public class NodeNetworkController<TNode extends Node, TNodeDTO extends NodeDTO<
         return ResponseEntity.ok(dataSource.findByOrFindAll(uuid,null, softDeleted));
     }
 
-    @GetMapping({"/{uuid}/own"})
-    public ResponseEntity<Object> findByUUIDAndSoftDeletedOwn(@PathVariable @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") String uuid,
-                                                                @RequestParam(required = false) Boolean softDeleted,
-                                                                Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(dataSource.findByOrFindAll(uuid,user.getUsername(), softDeleted));
-    }
-
-
-
     @PostMapping
     public ResponseEntity<Object> softDeleteAndCreate(@Valid @RequestBody TNodeDTO data, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
