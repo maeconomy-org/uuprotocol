@@ -16,8 +16,7 @@ public class OwnerUUIDService {
 
     public OwnerUUID createUUID(String ownerCertFingerprint) {
         String uuid = UUID.randomUUID().toString();
-        ownerUUIDDataSource.createOrUpdate(new OwnerUUID(uuid, ownerCertFingerprint));
-        return new OwnerUUID(uuid);
+        return ownerUUIDDataSource.createOrUpdate(new OwnerUUID(uuid, ownerCertFingerprint));
     }
 
     public List<OwnerUUID> findAll() {
@@ -28,7 +27,12 @@ public class OwnerUUIDService {
         return ownerUUIDDataSource.findByOwnerCertFingerprint(ownerCertFingerprint);
     }
 
-    public void validateOwnerUUID(String ownerCertFingerprint, String uuid) {
+    public OwnerUUID updateNodeType(OwnerUUID existingUUID, String nodeType) {
+        existingUUID.setNodeType(nodeType);
+        return ownerUUIDDataSource.createOrUpdate(existingUUID);
+    }
+
+    public OwnerUUID validateOwnerUUID(String ownerCertFingerprint, String uuid) {
         OwnerUUID existingUUID = ownerUUIDDataSource.findByUUID(uuid);
         if (existingUUID == null) {
             throw new NotFoundException("UUID not found");
@@ -36,6 +40,7 @@ public class OwnerUUIDService {
         if (!existingUUID.getOwnerCertFingerprint().equals(ownerCertFingerprint)) {
             throw new ForbiddenException("The UUID does not belong to this client");
         }
+        return existingUUID;
     }
 
 }
