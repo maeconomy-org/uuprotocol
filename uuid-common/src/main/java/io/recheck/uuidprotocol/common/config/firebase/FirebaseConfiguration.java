@@ -25,7 +25,6 @@ public class FirebaseConfiguration {
                 }
             }
             else {
-                // Use standard credentials chain. Useful when running inside GKE
                 return GoogleCredentials.getApplicationDefault();
             }
         }

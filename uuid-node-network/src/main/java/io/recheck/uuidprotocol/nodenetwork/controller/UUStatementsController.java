@@ -1,7 +1,7 @@
 package io.recheck.uuidprotocol.nodenetwork.controller;
 
 import io.recheck.uuidprotocol.nodenetwork.datasource.UUStatementsDataSource;
-import io.recheck.uuidprotocol.nodenetwork.dto.UUStatementsDTO;
+import io.recheck.uuidprotocol.nodenetwork.dto.UUStatementDTO;
 import io.recheck.uuidprotocol.nodenetwork.model.UUStatementPredicate;
 import io.recheck.uuidprotocol.nodenetwork.service.UUStatementsService;
 import jakarta.validation.Valid;
@@ -24,15 +24,22 @@ public class UUStatementsController {
     private final UUStatementsDataSource uuStatementsDataSource;
 
     @PostMapping
-    public ResponseEntity<Object> createOrUpdateStatements(@Valid @RequestBody @NotEmpty List<UUStatementsDTO> uuStatementsDTOList, Authentication authentication) {
+    public ResponseEntity<Object> createOrUpdateStatements(@Valid @RequestBody @NotEmpty List<UUStatementDTO> uuStatementDTOList, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuStatementsService.create(uuStatementsDTOList, user.getUsername()));
+        return ResponseEntity.ok(uuStatementsService.create(uuStatementDTOList, user.getUsername()));
     }
 
-    @DeleteMapping({"/{statementsId}"})
-    public ResponseEntity<Object> deleteUUStatements(@PathVariable String statementsId, Authentication authentication) {
+    @DeleteMapping({"/{subject}/{predicate}/{object}"})
+    public ResponseEntity<Object> deleteUUStatements(@PathVariable
+                                                         @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+                                                                 String subject,
+                                                     @PathVariable UUStatementPredicate predicate,
+                                                     @PathVariable
+                                                         @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+                                                                 String object,
+                                                     Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuStatementsService.softDelete(statementsId, user.getUsername()));
+        return ResponseEntity.ok(uuStatementsService.softDelete(new UUStatementDTO(subject, predicate, object), user.getUsername()));
     }
 
     @GetMapping

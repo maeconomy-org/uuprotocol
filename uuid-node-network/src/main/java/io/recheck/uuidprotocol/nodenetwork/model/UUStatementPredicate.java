@@ -13,10 +13,6 @@ public enum UUStatementPredicate {
         this.text = text;
     }
 
-    public String getText() {
-        return this.text;
-    }
-
     public static UUStatementPredicate fromString(String text) {
         for (UUStatementPredicate b : UUStatementPredicate.values()) {
             if (b.text.equalsIgnoreCase(text)) {
