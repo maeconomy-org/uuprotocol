@@ -30,7 +30,8 @@ public class UUStatementsService {
 
         List<UUStatements> uuStatementsList = new ArrayList<>();
         for (UUStatementDTO uuStatementDTO : uuStatementsSet) {
-            validateOwnerUUID(uuStatementDTO, ownerCertFingerprint);
+            //exclude validation of owning uuids - everyone could make statements
+//            validateOwnerUUID(uuStatementDTO, ownerCertFingerprint);
             uuStatementPredicateService.validateStatement(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate(), uuStatementDTO.getObject());
             uuStatementsList.add(findOrCreate(uuStatementDTO, ownerCertFingerprint));
             uuStatementsList.add(findOrCreate(buildOpposite(uuStatementDTO), ownerCertFingerprint));
@@ -47,7 +48,8 @@ public class UUStatementsService {
     }
 
     public List<UUStatements> softDelete(UUStatementDTO uuStatementDTO, String ownerCertFingerprint) {
-        validateOwnerUUID(uuStatementDTO, ownerCertFingerprint);
+        //exclude validation of owning uuids - everyone could soft delete statements
+//        validateOwnerUUID(uuStatementDTO, ownerCertFingerprint);
         UUStatements existingUUStatement = find(uuStatementDTO);
         UUStatements existingOppositeUUStatement = find(buildOpposite(uuStatementDTO));
 
