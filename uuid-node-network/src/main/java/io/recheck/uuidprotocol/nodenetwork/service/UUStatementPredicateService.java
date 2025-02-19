@@ -16,14 +16,14 @@ public class UUStatementPredicateService {
     private final UUPropertyDataSource uuPropertyDataSource;
     private final UUPropertyValueDataSource uuPropertyValueDataSource;
     private final UUObjectDataSource uuObjectDataSource;
-    private final UUFilesDataSource uuFilesDataSource;
+    private final UUFileDataSource uuFileDataSource;
     private final MultiValueMap<UUStatementPredicate, StatementValidate> possibleStatements;
 
-    public UUStatementPredicateService(UUPropertyDataSource uuPropertyDataSource, UUPropertyValueDataSource uuPropertyValueDataSource, UUObjectDataSource uuObjectDataSource, UUFilesDataSource uuFilesDataSource) {
+    public UUStatementPredicateService(UUPropertyDataSource uuPropertyDataSource, UUPropertyValueDataSource uuPropertyValueDataSource, UUObjectDataSource uuObjectDataSource, UUFileDataSource uuFileDataSource) {
         this.uuPropertyDataSource = uuPropertyDataSource;
         this.uuPropertyValueDataSource = uuPropertyValueDataSource;
         this.uuObjectDataSource = uuObjectDataSource;
-        this.uuFilesDataSource = uuFilesDataSource;
+        this.uuFileDataSource = uuFileDataSource;
 
         possibleStatements = MultiValueMap.fromMultiValue(
                 Map.ofEntries(
@@ -42,12 +42,12 @@ public class UUStatementPredicateService {
                         Map.entry(UUStatementPredicate.IS_VALUE_OF, List.of(new StatementValidate<>(uuPropertyValueDataSource, UUPropertyValue.class, uuPropertyDataSource, UUProperty.class))),
                         Map.entry(UUStatementPredicate.HAS_VALUE, List.of(new StatementValidate<>(uuPropertyDataSource, UUProperty.class, uuPropertyValueDataSource, UUPropertyValue.class))),
 
-                        Map.entry(UUStatementPredicate.IS_FILE_OF, List.of(new StatementValidate<>(uuFilesDataSource, UUFiles.class, uuPropertyValueDataSource, UUPropertyValue.class),
-                                new StatementValidate<>(uuFilesDataSource, UUFiles.class, uuPropertyDataSource, UUProperty.class),
-                                new StatementValidate<>(uuFilesDataSource, UUFiles.class, uuObjectDataSource, UUObject.class))),
-                        Map.entry(UUStatementPredicate.HAS_FILE, List.of(new StatementValidate<>(uuPropertyValueDataSource, UUPropertyValue.class, uuFilesDataSource, UUFiles.class),
-                                new StatementValidate<>(uuPropertyDataSource, UUProperty.class, uuFilesDataSource, UUFiles.class),
-                                new StatementValidate<>(uuObjectDataSource, UUObject.class, uuFilesDataSource, UUFiles.class)))
+                        Map.entry(UUStatementPredicate.IS_FILE_OF, List.of(new StatementValidate<>(uuFileDataSource, UUFile.class, uuPropertyValueDataSource, UUPropertyValue.class),
+                                new StatementValidate<>(uuFileDataSource, UUFile.class, uuPropertyDataSource, UUProperty.class),
+                                new StatementValidate<>(uuFileDataSource, UUFile.class, uuObjectDataSource, UUObject.class))),
+                        Map.entry(UUStatementPredicate.HAS_FILE, List.of(new StatementValidate<>(uuPropertyValueDataSource, UUPropertyValue.class, uuFileDataSource, UUFile.class),
+                                new StatementValidate<>(uuPropertyDataSource, UUProperty.class, uuFileDataSource, UUFile.class),
+                                new StatementValidate<>(uuObjectDataSource, UUObject.class, uuFileDataSource, UUFile.class)))
                 )
         );
     }

@@ -1,6 +1,6 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
-import io.recheck.uuidprotocol.domain.node.model.UUFiles;
+import io.recheck.uuidprotocol.domain.node.model.UUFile;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,7 +8,7 @@ import org.springframework.beans.BeanUtils;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class UUFilesDTO extends NodeDTO<UUFiles> {
+public class UUFileDTO extends NodeDTO<UUFile> {
 
     @NotBlank
     private String fileName;
@@ -19,9 +19,9 @@ public class UUFilesDTO extends NodeDTO<UUFiles> {
     private String label;
 
     @Override
-    public UUFiles build() {
-        UUFiles uuFiles = new UUFiles();
-        BeanUtils.copyProperties(this, uuFiles);
-        return uuFiles;
+    public UUFile build() {
+        UUFile uuFile = new UUFile();
+        BeanUtils.copyProperties(this, uuFile);
+        return uuFile;
     }
 }
