@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OwnerUUID {
+public class UUIDOwner {
 
     @FirestoreId
     @JsonIgnore
@@ -18,12 +18,12 @@ public class OwnerUUID {
     private String uuid;
 
     @JsonIgnore
-    private String ownerCertFingerprint;
+    private String certFingerprint;
 
     private String nodeType;
 
-    public OwnerUUID(String uuid, String ownerCertFingerprint) {
+    public UUIDOwner(String uuid, String certFingerprint) {
         this.uuid = uuid;
-        this.ownerCertFingerprint = ownerCertFingerprint;
+        this.certFingerprint = certFingerprint;
     }
 }

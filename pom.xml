@@ -67,7 +67,7 @@
 
 
     <modules>
-        <module>uuid-service</module>
+        <module>uuid-owner</module>
         <module>uuid-node-network</module>
         <module>uuid-common</module>
         <module>uuid-common-security</module>

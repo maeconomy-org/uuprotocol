@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>uuid-service</artifactId>
+    <artifactId>uuid-owner</artifactId>
 
     <dependencies>
         <dependency>

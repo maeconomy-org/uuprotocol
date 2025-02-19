@@ -15,13 +15,13 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
         super(type);
     }
 
-    public T createOrUpdateAudit(T pojoAudit, String ownerCertFingerprint) {
+    public T createOrUpdateAudit(T pojoAudit, String certFingerprint) {
         String documentId = getId(pojoAudit);
         Instant now = Instant.now();
         T existingObject = findByDocumentId(documentId);
         if (existingObject == null) {
             pojoAudit.setCreatedAt(now);
-            pojoAudit.setCreatedBy(ownerCertFingerprint);
+            pojoAudit.setCreatedBy(certFingerprint);
         }
         else {
             pojoAudit.setCreatedAt(existingObject.getCreatedAt());
@@ -32,14 +32,14 @@ public class AuditDataSource<T extends Audit> extends AbstractFirestoreDataSourc
         }
 
         pojoAudit.setLastUpdatedAt(now);
-        pojoAudit.setLastUpdatedBy(ownerCertFingerprint);
+        pojoAudit.setLastUpdatedBy(certFingerprint);
         return createOrUpdate(pojoAudit);
     }
 
-    public T softDeleteAudit(T existingObject, String ownerCertFingerprint) {
+    public T softDeleteAudit(T existingObject, String certFingerprint) {
         if (!existingObject.getSoftDeleted()) {
             existingObject.setSoftDeleted(true);
-            existingObject.setSoftDeleteBy(ownerCertFingerprint);
+            existingObject.setSoftDeleteBy(certFingerprint);
             existingObject.setSoftDeletedAt(Instant.now());
         }
 

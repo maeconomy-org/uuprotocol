@@ -1,6 +1,6 @@
-package io.recheck.uuidprotocol.uuidservice;
+package io.recheck.uuidprotocol.owner.controller;
 
-import io.recheck.uuidprotocol.domain.uuidowner.OwnerUUIDService;
+import io.recheck.uuidprotocol.domain.uuidowner.UUIDOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -11,27 +11,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/OwnerUUID")
+@RequestMapping(value = "/api/UUIDOwner")
 @RequiredArgsConstructor
-public class UUIDServiceController {
+public class UUIDOwnerController {
 
-    private final OwnerUUIDService ownerUUIDService;
+    private final UUIDOwnerService uuidOwnerService;
 
     @PostMapping
     public ResponseEntity<Object> createUUID(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(ownerUUIDService.createUUID(user.getUsername()));
+        return ResponseEntity.ok(uuidOwnerService.createUUID(user.getUsername()));
     }
 
     @GetMapping
     public ResponseEntity<Object> findAll() {
-        return ResponseEntity.ok(ownerUUIDService.findAll());
+        return ResponseEntity.ok(uuidOwnerService.findAll());
     }
 
     @GetMapping({"/own"})
     public ResponseEntity<Object> findByOwner(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(ownerUUIDService.findByOwner(user.getUsername()));
+        return ResponseEntity.ok(uuidOwnerService.findByOwner(user.getUsername()));
     }
 
 }
