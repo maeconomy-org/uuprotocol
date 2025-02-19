@@ -3,6 +3,7 @@ package io.recheck.uuidprotocol.common.datasource;
 import com.google.cloud.firestore.*;
 import com.google.firestore.v1.StructuredQuery;
 import io.recheck.uuidprotocol.common.datasource.model.FirestoreId;
+import io.recheck.uuidprotocol.common.exceptions.QueryBuildException;
 import io.recheck.uuidprotocol.common.querybuilder.QueryBuilder;
 import io.recheck.uuidprotocol.common.querybuilder.model.QueryCompositeFilter;
 import io.recheck.uuidprotocol.common.utils.ListUtils;
@@ -131,7 +132,7 @@ public abstract class AbstractTypeFirestoreDataSource<T_COLLECTION> {
                 break;
             }
             default -> {
-                throw new Exception("StructuredQuery.CompositeFilter.Operator not found");
+                throw new QueryBuildException("StructuredQuery.CompositeFilter.Operator not found");
             }
         }
         return where(filter, castType);

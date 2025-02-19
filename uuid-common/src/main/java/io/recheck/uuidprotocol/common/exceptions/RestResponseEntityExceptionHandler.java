@@ -1,6 +1,7 @@
 package io.recheck.uuidprotocol.common.exceptions;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -9,11 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.WebUtils;
 
@@ -22,30 +22,6 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-
-    @ExceptionHandler(QueryBuildException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handle(QueryBuildException exception) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(exception.getMessage());
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<String> handle(ForbiddenException exception) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(exception.getMessage());
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handle(NotFoundException exception) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(exception.getMessage());
-    }
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
@@ -70,6 +46,14 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 });
             }
 
+            if (ex instanceof HandlerMethodValidationException handlerMethodValidationException) {
+                for (MessageSourceResolvable error : handlerMethodValidationException.getAllErrors()) {
+                    String fieldName = ((FieldError) error).getField();
+                    String errorMessage = error.getDefaultMessage();
+                    errors.put(fieldName, errorMessage);
+                }
+            }
+
             body = new ProblemDetailEx(errorResponse.updateAndGetBody(getMessageSource(), LocaleContextHolder.getLocale()), errors);
 
         }
@@ -80,4 +64,5 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
         return createResponseEntity(body, headers, statusCode, request);
     }
+
 }
