@@ -23,6 +23,10 @@ public class UUIDOwnerService {
         return uuidOwnerDataSource.findAll();
     }
 
+    public UUIDOwner findByUUID(String uuid) {
+        return uuidOwnerDataSource.findByUUID(uuid);
+    }
+
     public List<UUIDOwner> findByOwner(String certFingerprint) {
         return uuidOwnerDataSource.findByCertFingerprint(certFingerprint);
     }
@@ -33,7 +37,7 @@ public class UUIDOwnerService {
     }
 
     public UUIDOwner validateOwnerUUID(String certFingerprint, String uuid) {
-        UUIDOwner existingUUID = uuidOwnerDataSource.findByUUID(uuid);
+        UUIDOwner existingUUID = findByUUID(uuid);
         if (existingUUID == null) {
             throw new NotFoundException("UUID not found");
         }

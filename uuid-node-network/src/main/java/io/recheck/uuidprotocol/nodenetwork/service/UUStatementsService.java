@@ -18,7 +18,7 @@ public class UUStatementsService {
 
     private final UUIDOwnerService uuidOwnerService;
     private final UUStatementsDataSource uuStatementsDataSource;
-    private final UUStatementPredicateService uuStatementPredicateService;
+    private final UUStatementsPossibleMapService uuStatementsPossibleMapService;
 
 
     public UUStatementDTO buildOpposite(UUStatementDTO uuStatementDTO) {
@@ -32,7 +32,9 @@ public class UUStatementsService {
         for (UUStatementDTO uuStatementDTO : uuStatementsSet) {
             //exclude validation of owning uuids - everyone could make statements
 //            validateOwnerUUID(uuStatementDTO, certFingerprint);
-            uuStatementPredicateService.validateStatement(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate(), uuStatementDTO.getObject());
+
+            uuStatementsPossibleMapService.validateStatement(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate(), uuStatementDTO.getObject());
+
             uuStatementsList.add(findOrCreate(uuStatementDTO, certFingerprint));
             uuStatementsList.add(findOrCreate(buildOpposite(uuStatementDTO), certFingerprint));
         }
