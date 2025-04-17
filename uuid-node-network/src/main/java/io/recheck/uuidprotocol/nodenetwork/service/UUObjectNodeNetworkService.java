@@ -1,9 +1,9 @@
 package io.recheck.uuidprotocol.nodenetwork.service;
 
-import io.recheck.uuidprotocol.domain.node.datasource.UUObjectDataSource;
 import io.recheck.uuidprotocol.domain.node.dto.UUObjectDTO;
 import io.recheck.uuidprotocol.domain.node.model.UUObject;
-import io.recheck.uuidprotocol.domain.uuidowner.UUIDOwnerService;
+import io.recheck.uuidprotocol.nodenetwork.datasource.UUObjectDataSource;
+import io.recheck.uuidprotocol.nodenetwork.owner.UUIDOwnerService;
 import org.springframework.stereotype.Service;
 
 @Service

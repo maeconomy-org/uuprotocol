@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.domain.uuidowner;
+package io.recheck.uuidprotocol.domain.owner.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.recheck.uuidprotocol.common.datasource.model.FirestoreId;

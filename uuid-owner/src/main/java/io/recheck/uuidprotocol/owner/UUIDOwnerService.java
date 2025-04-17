@@ -1,7 +1,8 @@
-package io.recheck.uuidprotocol.domain.uuidowner;
+package io.recheck.uuidprotocol.owner;
 
 import io.recheck.uuidprotocol.common.exceptions.ForbiddenException;
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
+import io.recheck.uuidprotocol.domain.owner.model.UUIDOwner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,11 @@ public class UUIDOwnerService {
         return uuidOwnerDataSource.findByCertFingerprint(certFingerprint);
     }
 
-    public UUIDOwner updateNodeType(UUIDOwner existingUUID, String nodeType) {
+    public UUIDOwner updateNodeType(String uuid, String nodeType) {
+        UUIDOwner existingUUID = findByUUID(uuid);
+        if (existingUUID == null) {
+            throw new NotFoundException("UUID not found");
+        }
         existingUUID.setNodeType(nodeType);
         return uuidOwnerDataSource.createOrUpdate(existingUUID);
     }
