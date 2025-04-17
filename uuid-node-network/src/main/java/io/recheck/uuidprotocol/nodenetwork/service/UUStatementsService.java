@@ -1,9 +1,9 @@
 package io.recheck.uuidprotocol.nodenetwork.service;
 
-import io.recheck.uuidprotocol.domain.node.datasource.UUStatementsDataSource;
 import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
 import io.recheck.uuidprotocol.domain.node.model.UUStatements;
-import io.recheck.uuidprotocol.domain.uuidowner.UUIDOwnerService;
+import io.recheck.uuidprotocol.nodenetwork.datasource.UUStatementsDataSource;
+import io.recheck.uuidprotocol.nodenetwork.owner.UUIDOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

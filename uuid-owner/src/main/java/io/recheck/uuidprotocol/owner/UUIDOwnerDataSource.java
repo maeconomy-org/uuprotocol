@@ -1,6 +1,7 @@
-package io.recheck.uuidprotocol.domain.uuidowner;
+package io.recheck.uuidprotocol.owner;
 
 import io.recheck.uuidprotocol.common.datasource.AbstractFirestoreDataSource;
+import io.recheck.uuidprotocol.domain.owner.model.UUIDOwner;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

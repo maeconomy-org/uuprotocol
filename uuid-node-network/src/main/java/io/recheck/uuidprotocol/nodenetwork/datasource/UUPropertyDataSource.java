@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.domain.node.datasource;
+package io.recheck.uuidprotocol.nodenetwork.datasource;
 
 import io.recheck.uuidprotocol.domain.node.model.UUProperty;
 import org.springframework.stereotype.Service;

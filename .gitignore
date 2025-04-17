@@ -2,6 +2,7 @@
 
 /uuid-common/src/main/resources/
 /uuid-common-security/src/main/resources/
+/uuid-node-network/src/main/resources/uuidowner-server-configuration.yaml
 
 
 /target/

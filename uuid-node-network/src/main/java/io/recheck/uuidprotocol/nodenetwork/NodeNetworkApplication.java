@@ -8,7 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 
 
 @SpringBootApplication(scanBasePackages = "io.recheck.uuidprotocol")
-@PropertySource(value = {"application-node-network.yaml"}, factory = YamlPropertySourceFactory.class)
+@PropertySource(value = {"application-node-network.yaml", "uuidowner-server-configuration.yaml"}, factory = YamlPropertySourceFactory.class)
 //@PropertySource(value={"classpath:application-node-network-${spring.profiles.active}.properties"})
 public class NodeNetworkApplication {
 
