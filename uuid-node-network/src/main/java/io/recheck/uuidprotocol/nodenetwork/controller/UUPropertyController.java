@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/UUProperty")
-public class UUPropertyController extends NodeNetworkController<UUProperty, UUPropertyDTO> {
+public class UUPropertyController extends UUAbstractNodeController<UUProperty, UUPropertyDTO> {
     public UUPropertyController(UUPropertyNodeNetworkService uuPropertyNodeNetworkService, UUPropertyDataSource uuPropertyDataSource) {
         super(uuPropertyNodeNetworkService, uuPropertyDataSource);
     }
