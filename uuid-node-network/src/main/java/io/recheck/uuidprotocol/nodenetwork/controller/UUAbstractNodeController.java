@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RequiredArgsConstructor
-public class NodeNetworkController<TNode extends Node, TNodeDTO extends NodeDTO<TNode>> {
+public class UUAbstractNodeController<TNode extends Node, TNodeDTO extends NodeDTO<TNode>> {
 
     private final NodeNetworkService<TNode, TNodeDTO> nodeNetworkService;
     private final NodeDataSource<TNode> dataSource;

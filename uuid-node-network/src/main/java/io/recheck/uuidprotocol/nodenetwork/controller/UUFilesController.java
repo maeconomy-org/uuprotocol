@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/UUFile")
-public class UUFilesController extends NodeNetworkController<UUFile, UUFileDTO> {
+public class UUFilesController extends UUAbstractNodeController<UUFile, UUFileDTO> {
     public UUFilesController(UUFilesNodeNetworkService uuFilesNodeNetworkService, UUFileDataSource uuFileDataSource) {
         super(uuFilesNodeNetworkService, uuFileDataSource);
     }
