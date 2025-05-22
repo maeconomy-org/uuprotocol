@@ -73,7 +73,7 @@ public abstract class AbstractTypeFirestoreDataSource<T_COLLECTION> {
                     return new ArrayList<>();
                 }
             }
-            return documentSnapshotToObjects(firestore.collection(type.getSimpleName()).whereEqualTo(fieldPath, value).get().get().getDocuments(), castType);
+            return documentSnapshotToObjects(firestore.collection(type.getSimpleName()).orderBy("lastUpdatedAt", Query.Direction.DESCENDING).whereEqualTo(fieldPath, value).get().get().getDocuments(), castType);
         }
         return new ArrayList<>();
     }
@@ -90,7 +90,7 @@ public abstract class AbstractTypeFirestoreDataSource<T_COLLECTION> {
                 @Override
                 @SneakyThrows
                 public void accept(List<? extends Object> batch) {
-                    queryDocumentSnapshots.addAll(firestore.collection(type.getSimpleName()).whereIn(fieldPath, batch).get().get().getDocuments());
+                    queryDocumentSnapshots.addAll(firestore.collection(type.getSimpleName()).orderBy("lastUpdatedAt", Query.Direction.DESCENDING).whereIn(fieldPath, batch).get().get().getDocuments());
                 }
             });
         }
@@ -103,7 +103,7 @@ public abstract class AbstractTypeFirestoreDataSource<T_COLLECTION> {
 
     @SneakyThrows
     public <T_CAST> List<T_CAST> where(Filter filter, Class<T_CAST> castType) {
-        return documentSnapshotToObjects(firestore.collection(type.getSimpleName()).where(filter).get().get().getDocuments(), castType);
+        return documentSnapshotToObjects(firestore.collection(type.getSimpleName()).orderBy("lastUpdatedAt", Query.Direction.DESCENDING).where(filter).get().get().getDocuments(), castType);
     }
 
     public <T_CAST> List<T_CAST> whereAndFiltersOrFindAll(List<Filter> filters, Class<T_CAST> castType) {
