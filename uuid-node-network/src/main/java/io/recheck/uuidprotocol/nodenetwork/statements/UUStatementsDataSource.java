@@ -1,7 +1,8 @@
-package io.recheck.uuidprotocol.nodenetwork.datasource;
+package io.recheck.uuidprotocol.nodenetwork.statements;
 
 import com.google.cloud.firestore.Filter;
 import io.recheck.uuidprotocol.domain.node.model.UUStatements;
+import io.recheck.uuidprotocol.nodenetwork.datasource.AuditDataSource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,13 @@ public class UUStatementsDataSource extends AuditDataSource<UUStatements> {
                                     Filter.equalTo("predicate", predicate),
                                     Filter.equalTo("object", object),
                                     Filter.equalTo("softDeleted", false));
+        Optional<UUStatements> firstNodeOptional = where(filter).stream().findFirst();
+        return firstNodeOptional.orElse(null);
+    }
+
+    public UUStatements findByUUID(String uuid) {
+        Filter filter = Filter.and(Filter.or(Filter.equalTo("subject", uuid), Filter.equalTo("object", uuid)),
+                Filter.equalTo("softDeleted", false));
         Optional<UUStatements> firstNodeOptional = where(filter).stream().findFirst();
         return firstNodeOptional.orElse(null);
     }

@@ -5,6 +5,7 @@ import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
 import io.recheck.uuidprotocol.domain.node.dto.NodeDTO;
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.domain.owner.model.UUIDOwner;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.AggregateService;
 import io.recheck.uuidprotocol.nodenetwork.datasource.NodeDataSource;
 import io.recheck.uuidprotocol.nodenetwork.owner.UUIDOwnerService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
 
     private final NodeDataSource<TNode> dataSource;
     private final UUIDOwnerService uuidOwnerService;
+    private final AggregateService aggregateService;
 
     public TNode softDeleteAndCreate(TNodeDTO dto, String certFingerprint) {
         UUIDOwner uuidOwner = uuidOwnerService.validateOwnerUUID(certFingerprint, dto.getUuid());
@@ -35,7 +37,9 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
             dataSource.softDeleteAudit(existingUUIDNode, certFingerprint);
         }
 
-        return dataSource.createOrUpdateAudit(dto.build(), certFingerprint);
+        TNode node = dataSource.createOrUpdateAudit(dto.build(), certFingerprint);
+        aggregateService.updateNode(node);
+        return node;
     }
 
     public TNode softDelete(String uuid, String certFingerprint) {
@@ -46,7 +50,9 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
             throw new NotFoundException("Not found for soft delete");
         }
 
-        return dataSource.softDeleteAudit(existingUUIDNode, certFingerprint);
+        TNode node = dataSource.softDeleteAudit(existingUUIDNode, certFingerprint);
+        aggregateService.updateNode(node);
+        return node;
     }
 
 }
