@@ -2,6 +2,7 @@ package io.recheck.uuidprotocol.domain.owner.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.recheck.uuidprotocol.common.datasource.model.FirestoreId;
+import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UUIDOwner {
+public class UUIDOwner extends Audit {
 
     @FirestoreId
     @JsonIgnore

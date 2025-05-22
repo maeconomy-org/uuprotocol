@@ -1,13 +1,13 @@
 package io.recheck.uuidprotocol.owner;
 
-import io.recheck.uuidprotocol.common.datasource.AbstractFirestoreDataSource;
+import io.recheck.uuidprotocol.common.datasource.AuditDataSource;
 import io.recheck.uuidprotocol.domain.owner.model.UUIDOwner;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UUIDOwnerDataSource extends AbstractFirestoreDataSource<UUIDOwner> {
+public class UUIDOwnerDataSource extends AuditDataSource<UUIDOwner> {
 
     public UUIDOwnerDataSource() {
         super(UUIDOwner.class);

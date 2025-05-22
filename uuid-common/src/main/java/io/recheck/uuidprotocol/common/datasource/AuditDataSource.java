@@ -1,7 +1,6 @@
-package io.recheck.uuidprotocol.nodenetwork.datasource;
+package io.recheck.uuidprotocol.common.datasource;
 
 import com.google.cloud.firestore.Filter;
-import io.recheck.uuidprotocol.common.datasource.AbstractFirestoreDataSource;
 import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
 import org.springframework.util.StringUtils;
 

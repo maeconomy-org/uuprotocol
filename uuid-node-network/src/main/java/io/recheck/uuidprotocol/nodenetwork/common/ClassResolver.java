@@ -28,7 +28,7 @@ public class ClassResolver {
     @SneakyThrows
     public <TNode extends Node> Class<TNode> getNodeClassTypeOfUUID(String uuid) {
         UUIDOwner uuidOwner = uuidOwnerService.findByUUID(uuid);
-        if (!StringUtils.hasText(uuidOwner.getNodeType())) {
+        if (uuidOwner == null || !StringUtils.hasText(uuidOwner.getNodeType())) {
             throw new IllegalArgumentException("No Node Type found for uuid: " + uuid);
         }
         return (Class<TNode>) Class.forName("io.recheck.uuidprotocol.domain.node.model."+uuidOwner.getNodeType());
