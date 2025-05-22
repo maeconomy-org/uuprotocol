@@ -19,21 +19,10 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
     private final AggregateService aggregateService;
 
     public TNode softDeleteAndCreate(TNodeDTO dto, String certFingerprint) {
-        UUIDOwner uuidOwner = uuidOwnerService.validateOwnerUUID(certFingerprint, dto.getUuid());
+        validateAndUpdateType(dto, certFingerprint);
 
         TNode existingUUIDNode = dataSource.findByUUIDAndSoftDeletedFalse(dto.getUuid());
-        if (existingUUIDNode == null) {
-            //create
-            //validate if uuid is already used with another type of node
-            if (StringUtils.hasText(uuidOwner.getNodeType())) {
-                throw new ForbiddenException("The UUID has been already used by another type of node");
-            }
-            else {
-                uuidOwnerService.updateNodeType(uuidOwner.getUuid(), dataSource.getType().getSimpleName());
-            }
-        }
-        else {
-            //update
+        if (existingUUIDNode != null) {
             dataSource.softDeleteAudit(existingUUIDNode, certFingerprint);
         }
 
@@ -53,6 +42,22 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
         TNode node = dataSource.softDeleteAudit(existingUUIDNode, certFingerprint);
         aggregateService.updateNode(node);
         return node;
+    }
+
+    private void validateAndUpdateType(TNodeDTO dto, String certFingerprint) {
+        UUIDOwner uuidOwner = uuidOwnerService.validateOwnerUUID(certFingerprint, dto.getUuid());
+
+        TNode existingUUIDNode = dataSource.findByUUID(dto.getUuid());
+        if (existingUUIDNode == null) {
+            //create
+            //validate if uuid is already used with another type of node
+            if (StringUtils.hasText(uuidOwner.getNodeType())) {
+                throw new ForbiddenException("The UUID has been already used by another type of node");
+            }
+            else {
+                uuidOwnerService.updateNodeType(uuidOwner.getUuid(), dataSource.getType().getSimpleName());
+            }
+        }
     }
 
 }
