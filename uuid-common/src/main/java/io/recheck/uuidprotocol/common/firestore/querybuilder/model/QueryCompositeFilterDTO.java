@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.common.querybuilder.model;
+package io.recheck.uuidprotocol.common.firestore.querybuilder.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.firestore.v1.StructuredQuery;

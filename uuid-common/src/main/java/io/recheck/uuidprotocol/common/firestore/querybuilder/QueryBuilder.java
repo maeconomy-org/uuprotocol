@@ -1,10 +1,10 @@
-package io.recheck.uuidprotocol.common.querybuilder;
+package io.recheck.uuidprotocol.common.firestore.querybuilder;
 
 import com.google.cloud.firestore.Filter;
 import com.google.firestore.v1.StructuredQuery;
 import io.recheck.uuidprotocol.common.exceptions.QueryBuildException;
-import io.recheck.uuidprotocol.common.querybuilder.model.QueryCompositeFilter;
-import io.recheck.uuidprotocol.common.querybuilder.model.QueryUnaryFilter;
+import io.recheck.uuidprotocol.common.firestore.querybuilder.model.QueryCompositeFilter;
+import io.recheck.uuidprotocol.common.firestore.querybuilder.model.QueryUnaryFilter;
 import lombok.SneakyThrows;
 
 import java.util.ArrayList;

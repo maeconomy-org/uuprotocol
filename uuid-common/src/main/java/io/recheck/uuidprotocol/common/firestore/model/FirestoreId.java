@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.common.datasource.model;
+package io.recheck.uuidprotocol.common.firestore.model;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
