@@ -1,13 +1,13 @@
 package io.recheck.uuidprotocol.nodenetwork.controller;
 
 
+import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import io.recheck.uuidprotocol.nodenetwork.common.ClassResolver;
 import io.recheck.uuidprotocol.nodenetwork.datasource.NodeDataSource;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +21,7 @@ public class CommonController {
     private final ClassResolver classResolver;
 
     @GetMapping({"/cert"})
-    public ResponseEntity<Object> getCert(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+    public ResponseEntity<Object> getCert(@AuthenticationPrincipal X509UserDetails user) {
         return ResponseEntity.ok(user);
     }
 

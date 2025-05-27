@@ -1,10 +1,10 @@
 package io.recheck.uuidprotocol.owner;
 
 
+import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,8 +17,7 @@ public class CommonController {
     private final UUIDOwnerService uuidOwnerService;
 
     @GetMapping({"/cert"})
-    public ResponseEntity<Object> getCert(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+    public ResponseEntity<Object> getCert(@AuthenticationPrincipal X509UserDetails user) {
         return ResponseEntity.ok(user);
     }
 

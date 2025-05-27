@@ -1,10 +1,10 @@
 package io.recheck.uuidprotocol.owner;
 
+import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,9 +15,8 @@ public class UUIDOwnerController {
     private final UUIDOwnerService uuidOwnerService;
 
     @PostMapping
-    public ResponseEntity<Object> createUUID(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuidOwnerService.createUUID(user.getUsername()));
+    public ResponseEntity<Object> createUUID(@AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(uuidOwnerService.createUUID(user.getCertFingerprint()));
     }
 
     @GetMapping
@@ -26,9 +25,8 @@ public class UUIDOwnerController {
     }
 
     @GetMapping({"/own"})
-    public ResponseEntity<Object> findByOwner(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuidOwnerService.findByOwner(user.getUsername()));
+    public ResponseEntity<Object> findByOwner(@AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(uuidOwnerService.findByOwner(user.getCertFingerprint()));
     }
 
     @GetMapping({"/{uuid}"})

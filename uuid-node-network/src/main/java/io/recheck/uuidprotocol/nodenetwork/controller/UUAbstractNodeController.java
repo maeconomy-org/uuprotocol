@@ -1,5 +1,6 @@
 package io.recheck.uuidprotocol.nodenetwork.controller;
 
+import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import io.recheck.uuidprotocol.domain.node.dto.NodeDTO;
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.nodenetwork.datasource.NodeDataSource;
@@ -8,8 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,9 +25,8 @@ public class UUAbstractNodeController<TNode extends Node, TNodeDTO extends NodeD
     }
 
     @GetMapping({"/own"})
-    public ResponseEntity<Object> findBySoftDeletedOwn(@RequestParam(required = false) Boolean softDeleted, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(dataSource.findByOrFindAll(user.getUsername(), softDeleted));
+    public ResponseEntity<Object> findBySoftDeletedOwn(@RequestParam(required = false) Boolean softDeleted, @AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(dataSource.findByOrFindAll(user.getCertFingerprint(), softDeleted));
     }
 
 
@@ -38,17 +37,15 @@ public class UUAbstractNodeController<TNode extends Node, TNodeDTO extends NodeD
     }
 
     @PostMapping
-    public ResponseEntity<Object> softDeleteAndCreate(@Valid @RequestBody TNodeDTO data, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(nodeNetworkService.softDeleteAndCreate(data, user.getUsername()));
+    public ResponseEntity<Object> softDeleteAndCreate(@Valid @RequestBody TNodeDTO data, @AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(nodeNetworkService.softDeleteAndCreate(data, user.getCertFingerprint()));
     }
 
     @DeleteMapping({"/{uuid}"})
     public ResponseEntity<Object> softDelete(@PathVariable
                                                      @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-                                                             String uuid, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(nodeNetworkService.softDelete(uuid, user.getUsername()));
+                                                             String uuid, @AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(nodeNetworkService.softDelete(uuid, user.getCertFingerprint()));
     }
 
 
