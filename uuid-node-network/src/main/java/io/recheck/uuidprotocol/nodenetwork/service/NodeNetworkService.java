@@ -55,7 +55,7 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
                 throw new ForbiddenException("The UUID has been already used by another type of node");
             }
             else {
-                uuidOwnerService.updateNodeType(uuidOwner.getUuid(), dataSource.getType().getSimpleName());
+                uuidOwnerService.updateNodeType(uuidOwner.getUuid(), dataSource.getCollectionType().getSimpleName());
             }
         }
     }

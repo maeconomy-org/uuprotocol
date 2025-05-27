@@ -1,22 +1,21 @@
 package io.recheck.uuidprotocol.common.utils;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ListUtils {
 
-    public static Stream<List<? extends Object>> batches(List<? extends Object> source, int length) {
-        if (length <= 0)
-            throw new IllegalArgumentException("length = " + length);
+    public static List<List<? extends Object>> batches(List<? extends Object> source, int length) {
+        List<List<? extends Object>> chunks = new ArrayList<>();
 
         int size = source.size();
-        if (size <= 0)
-            return Stream.empty();
+        for (int i = 0; i < size; i += length) {
+            int end = Math.min(size, i + length);
+            chunks.add(new ArrayList<>(source.subList(i, end)));
+        }
 
-        int fullChunks = (size - 1) / length;
-
-        return IntStream.range(0, fullChunks + 1).mapToObj(n -> source.subList(n * length, n == fullChunks ? size : (n + 1) * length));
+        return chunks;
     }
 
     public static <T> List<T> concat(List<T> listOne, List<T> listTwo) {

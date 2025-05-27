@@ -17,7 +17,7 @@ public class UUIDOwnerService {
 
     public UUIDOwner createUUID(String certFingerprint) {
         String uuid = UUID.randomUUID().toString();
-        return uuidOwnerDataSource.createOrUpdateAudit(new UUIDOwner(uuid, certFingerprint), certFingerprint);
+        return uuidOwnerDataSource.createOrUpdate(new UUIDOwner(uuid, certFingerprint));
     }
 
     public List<UUIDOwner> findAll() {
@@ -38,7 +38,7 @@ public class UUIDOwnerService {
             throw new NotFoundException("UUID not found");
         }
         existingUUID.setNodeType(nodeType);
-        return uuidOwnerDataSource.createOrUpdateAudit(existingUUID, existingUUID.getCertFingerprint());
+        return uuidOwnerDataSource.createOrUpdate(existingUUID);
     }
 
     public UUIDOwner validateOwnerUUID(String certFingerprint, String uuid) {

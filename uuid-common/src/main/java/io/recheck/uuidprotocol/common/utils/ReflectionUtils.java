@@ -1,5 +1,7 @@
 package io.recheck.uuidprotocol.common.utils;
 
+import lombok.SneakyThrows;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -7,6 +9,24 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class ReflectionUtils {
+
+    @SneakyThrows
+    public static <T> T getValueAnnotationPresent(Class<? extends Annotation> annotationClass, Object object) {
+        Optional<Field> optionalField = ReflectionUtils.findAnnotationPresent(annotationClass, object.getClass());
+        if (optionalField.isPresent()) {
+            return (T) optionalField.get().get(object);
+        }
+        return null;
+    }
+
+    @SneakyThrows
+    public static void setValueAnnotationPresent(Class<? extends Annotation> annotationClass, Object object, String value) {
+        Optional<Field> idFieldOptional = ReflectionUtils.findAnnotationPresent(annotationClass, object.getClass());
+        if (idFieldOptional.isPresent()) {
+            idFieldOptional.get().set(object, value);
+        }
+    }
+
 
     public static Optional<Field> findAnnotationPresent(Class<? extends Annotation> annotationClass, Class<?> clazz) {
         return getAllFields(clazz).stream().filter(field -> field.isAnnotationPresent(annotationClass)).findFirst();
@@ -42,7 +62,7 @@ public class ReflectionUtils {
         return false;
     }
 
-    public static boolean typeMatches(Type genericType, Class<?> targetType) {
+    private static boolean typeMatches(Type genericType, Class<?> targetType) {
         if (!(genericType instanceof ParameterizedType pt)) return false;
 
         Type[] typeArgs = pt.getActualTypeArguments();
