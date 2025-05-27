@@ -1,9 +1,7 @@
 package io.recheck.uuidprotocol.common.security;
 
 import io.recheck.uuidprotocol.common.yaml.YamlPropertySourceFactory;
-import jakarta.xml.bind.DatatypeConverter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,16 +11,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.security.MessageDigest;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 @Slf4j
@@ -38,19 +32,7 @@ public class X509ClientsSecurityConfiguration {
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests.anyRequest().authenticated()
                 )
-                .x509(httpSecurityX509Configurer -> {
-                    httpSecurityX509Configurer.authenticationUserDetailsService(new AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken>() {
-                        @SneakyThrows
-                        public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
-                            X509Certificate cert = (X509Certificate)token.getCredentials();
-                            MessageDigest md = MessageDigest.getInstance("SHA-256");
-                            md.update(cert.getEncoded());
-                            String fingerprint = DatatypeConverter.printHexBinary(md.digest()).toLowerCase();
-
-                            return new User(fingerprint, "", AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_CLIENT"));
-                        }
-                    });
-                })
+                .x509(x509 -> x509.authenticationUserDetailsService(new X509UserDetailsService()))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.NEVER))
                 .csrf(AbstractHttpConfigurer::disable);

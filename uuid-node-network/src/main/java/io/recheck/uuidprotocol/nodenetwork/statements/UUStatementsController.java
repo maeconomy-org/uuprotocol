@@ -1,5 +1,6 @@
 package io.recheck.uuidprotocol.nodenetwork.statements;
 
+import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
 import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
 import jakarta.validation.Valid;
@@ -7,8 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +22,8 @@ public class UUStatementsController {
     private final UUStatementsDataSource uuStatementsDataSource;
 
     @PostMapping
-    public ResponseEntity<Object> findOrCreate(@Valid @RequestBody @NotEmpty List<UUStatementDTO> uuStatementDTOList, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuStatementsService.findOrCreate(uuStatementDTOList, user.getUsername()));
+    public ResponseEntity<Object> findOrCreate(@Valid @RequestBody @NotEmpty List<UUStatementDTO> uuStatementDTOList, @AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(uuStatementsService.findOrCreate(uuStatementDTOList, user.getCertFingerprint()));
     }
 
     @DeleteMapping({"/{subject}/{predicate}/{object}"})
@@ -35,9 +34,8 @@ public class UUStatementsController {
                                                      @PathVariable
                                                          @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
                                                                  String object,
-                                                     Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuStatementsService.softDelete(new UUStatementDTO(subject, predicate, object), user.getUsername()));
+                                             @AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(uuStatementsService.softDelete(new UUStatementDTO(subject, predicate, object), user.getCertFingerprint()));
     }
 
     @GetMapping
@@ -46,9 +44,8 @@ public class UUStatementsController {
     }
 
     @GetMapping({"/own"})
-    public ResponseEntity<Object> findBySoftDeletedOwn(@RequestParam(required = false) Boolean softDeleted, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(uuStatementsDataSource.findByOrFindAll(user.getUsername(), softDeleted));
+    public ResponseEntity<Object> findBySoftDeletedOwn(@RequestParam(required = false) Boolean softDeleted, @AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(uuStatementsDataSource.findByOrFindAll(user.getCertFingerprint(), softDeleted));
     }
 
     @GetMapping({"/{predicate}"})
