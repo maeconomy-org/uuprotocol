@@ -2,10 +2,9 @@ package io.recheck.uuidprotocol.nodenetwork.statements;
 
 import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
-import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
+import io.recheck.uuidprotocol.domain.node.dto.UUStatementFindDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,42 +22,23 @@ public class UUStatementsController {
 
     @PostMapping
     public ResponseEntity<Object> findOrCreate(@Valid @RequestBody @NotEmpty List<UUStatementDTO> uuStatementDTOList, @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(uuStatementsService.findOrCreate(uuStatementDTOList, user.getCertFingerprint()));
+        return ResponseEntity.ok(uuStatementsService.findOrCreateWithOpposite(uuStatementDTOList, user.getCertFingerprint()));
     }
 
-    @DeleteMapping({"/{subject}/{predicate}/{object}"})
-    public ResponseEntity<Object> softDelete(@PathVariable
-                                                         @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-                                                                 String subject,
-                                                     @PathVariable UUStatementPredicate predicate,
-                                                     @PathVariable
-                                                         @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-                                                                 String object,
-                                             @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(uuStatementsService.softDelete(new UUStatementDTO(subject, predicate, object), user.getCertFingerprint()));
+    @DeleteMapping
+    public ResponseEntity<Object> softDelete(@Valid @RequestBody UUStatementDTO uuStatementDTO, @AuthenticationPrincipal X509UserDetails user) {
+        return ResponseEntity.ok(uuStatementsService.softDeleteWithOpposite(uuStatementDTO, user.getCertFingerprint()));
     }
 
     @GetMapping
-    public ResponseEntity<Object> findBySoftDeleted(@RequestParam(required = false) Boolean softDeleted) {
-        return ResponseEntity.ok(uuStatementsDataSource.findByOrFindAll(null, softDeleted));
+    public ResponseEntity<Object> find(@Valid UUStatementFindDTO uuStatementFindDTO) {
+        return ResponseEntity.ok(uuStatementsDataSource.where(uuStatementFindDTO));
     }
 
     @GetMapping({"/own"})
-    public ResponseEntity<Object> findBySoftDeletedOwn(@RequestParam(required = false) Boolean softDeleted, @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(uuStatementsDataSource.findByOrFindAll(user.getCertFingerprint(), softDeleted));
-    }
-
-    @GetMapping({"/{predicate}"})
-    public ResponseEntity<Object> readStatementsByPredicate(@PathVariable UUStatementPredicate predicate) {
-        return ResponseEntity.ok(uuStatementsDataSource.findByPredicate(predicate.name()));
-    }
-
-    @GetMapping({"/{uuid}/{predicate}"})
-    public ResponseEntity<Object> readStatementsByUUIDAndPredicate(@PathVariable
-                                                       @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-                                                               String uuid,
-                                                       @PathVariable UUStatementPredicate predicate) {
-        return ResponseEntity.ok(uuStatementsDataSource.findBySubjectAndPredicate(uuid, predicate.name()));
+    public ResponseEntity<Object> findBySoftDeletedOwn(@Valid UUStatementFindDTO uuStatementFindDTO, @AuthenticationPrincipal X509UserDetails user) {
+        uuStatementFindDTO.setCreatedBy(user.getCertFingerprint());
+        return ResponseEntity.ok(uuStatementsDataSource.where(uuStatementFindDTO));
     }
 
 }

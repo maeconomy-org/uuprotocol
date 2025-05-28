@@ -2,6 +2,7 @@ package io.recheck.uuidprotocol.nodenetwork.controller;
 
 import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import io.recheck.uuidprotocol.domain.node.dto.NodeDTO;
+import io.recheck.uuidprotocol.domain.node.dto.NodeFindDTO;
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.nodenetwork.datasource.NodeDataSource;
 import io.recheck.uuidprotocol.nodenetwork.service.NodeNetworkService;
@@ -19,23 +20,6 @@ public class UUAbstractNodeController<TNode extends Node, TNodeDTO extends NodeD
     private final NodeNetworkService<TNode, TNodeDTO> nodeNetworkService;
     private final NodeDataSource<TNode> dataSource;
 
-    @GetMapping
-    public ResponseEntity<Object> findBySoftDeleted(@RequestParam(required = false) Boolean softDeleted) {
-        return ResponseEntity.ok(dataSource.findByOrFindAll(null, softDeleted));
-    }
-
-    @GetMapping({"/own"})
-    public ResponseEntity<Object> findBySoftDeletedOwn(@RequestParam(required = false) Boolean softDeleted, @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(dataSource.findByOrFindAll(user.getCertFingerprint(), softDeleted));
-    }
-
-
-    @GetMapping({"/{uuid}"})
-    public ResponseEntity<Object> findByUUIDAndSoftDeleted(@PathVariable @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") String uuid,
-                                                            @RequestParam(required = false) Boolean softDeleted) {
-        return ResponseEntity.ok(dataSource.findByOrFindAll(uuid,null, softDeleted));
-    }
-
     @PostMapping
     public ResponseEntity<Object> softDeleteAndCreate(@Valid @RequestBody TNodeDTO data, @AuthenticationPrincipal X509UserDetails user) {
         return ResponseEntity.ok(nodeNetworkService.softDeleteAndCreate(data, user.getCertFingerprint()));
@@ -48,5 +32,15 @@ public class UUAbstractNodeController<TNode extends Node, TNodeDTO extends NodeD
         return ResponseEntity.ok(nodeNetworkService.softDelete(uuid, user.getCertFingerprint()));
     }
 
+    @GetMapping
+    public ResponseEntity<Object> findBySoftDeleted(@Valid NodeFindDTO nodeFindDTO) {
+        return ResponseEntity.ok(dataSource.where(nodeFindDTO));
+    }
+
+    @GetMapping({"/own"})
+    public ResponseEntity<Object> findBySoftDeletedOwn(@Valid NodeFindDTO nodeFindDTO, @AuthenticationPrincipal X509UserDetails user) {
+        nodeFindDTO.setCreatedBy(user.getCertFingerprint());
+        return ResponseEntity.ok(dataSource.where(nodeFindDTO));
+    }
 
 }

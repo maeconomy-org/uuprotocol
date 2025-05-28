@@ -1,13 +1,10 @@
 package io.recheck.uuidprotocol.nodenetwork.datasource;
 
-import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Query;
 import io.recheck.uuidprotocol.common.firestore.FirestoreDataSource;
 import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
-import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,19 +45,8 @@ public class AuditDataSource<T extends Audit> extends FirestoreDataSource<T> {
         return createOrUpdate(existingObject);
     }
 
-    public List<T> findByOrFindAll(String createdBy, Boolean softDeleted) {
-        List<Filter> filters = new ArrayList<>();
-        if (StringUtils.hasText(createdBy)) {
-            filters.add(Filter.equalTo("createdBy", createdBy));
-        }
-        if (softDeleted != null) {
-            filters.add(Filter.equalTo("softDeleted", softDeleted));
-        }
-
+    public List<T> where(Object pojo) {
         Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
-
-        return where(Filter.and(filters.toArray(new Filter[0])), orderByLastUpdatedAt);
+        return super.where(pojo, orderByLastUpdatedAt);
     }
-
-
 }

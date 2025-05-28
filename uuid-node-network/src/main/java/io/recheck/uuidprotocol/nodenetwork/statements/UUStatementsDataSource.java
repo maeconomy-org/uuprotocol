@@ -1,41 +1,42 @@
 package io.recheck.uuidprotocol.nodenetwork.statements;
 
 import com.google.cloud.firestore.Filter;
+import com.google.cloud.firestore.Query;
 import io.recheck.uuidprotocol.domain.node.model.UUStatements;
 import io.recheck.uuidprotocol.nodenetwork.datasource.AuditDataSource;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.Map;
 
 @Service
 public class UUStatementsDataSource extends AuditDataSource<UUStatements> {
+
     public UUStatementsDataSource() {
         super(UUStatements.class);
     }
 
-    public UUStatements find(String subject, String predicate, String object) {
-        Filter filter = Filter.and(Filter.equalTo("subject", subject),
-                                    Filter.equalTo("predicate", predicate),
-                                    Filter.equalTo("object", object),
-                                    Filter.equalTo("softDeleted", false));
-        Optional<UUStatements> firstNodeOptional = where(filter).stream().findFirst();
-        return firstNodeOptional.orElse(null);
+    public UUStatements findLastUpdated(UUStatements uuStatements) {
+        Filter filter = Filter.and(Filter.equalTo("subject", uuStatements.getSubject()),
+                                    Filter.equalTo("predicate", uuStatements.getPredicate()),
+                                    Filter.equalTo("object", uuStatements.getObject()));
+        Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
+        return whereFindFirst(filter, orderByLastUpdatedAt);
     }
 
-    public UUStatements findByUUID(String uuid) {
-        Filter filter = Filter.and(Filter.or(Filter.equalTo("subject", uuid), Filter.equalTo("object", uuid)),
-                Filter.equalTo("softDeleted", false));
-        Optional<UUStatements> firstNodeOptional = where(filter).stream().findFirst();
-        return firstNodeOptional.orElse(null);
+    public Boolean exist(String uuid) {
+        Filter filter = Filter.or(Filter.equalTo("subject", uuid), Filter.equalTo("object", uuid));
+        return where(filter).stream().findFirst().isPresent();
     }
 
-    public List<UUStatements> findBySubjectAndPredicate(String subject, String predicate) {
-        Filter filter = Filter.and(Filter.equalTo("subject", subject), Filter.equalTo("predicate", predicate));
-        return where(filter);
-    }
-
-    public List<UUStatements> findByPredicate(String predicate) {
-        return whereEqualTo("predicate", predicate);
+    @Override
+    public UUStatements softDeleteAudit(UUStatements existingObject, String certFingerprint) {
+        Instant now = Instant.now();
+        existingObject.setSoftDeleted(true);
+        existingObject.setSoftDeleteBy(certFingerprint);
+        existingObject.setSoftDeletedAt(Instant.now());
+        existingObject.setLastUpdatedAt(now);
+        existingObject.setLastUpdatedBy(certFingerprint);
+        return createOrUpdate(existingObject);
     }
 }

@@ -21,9 +21,12 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
     public TNode softDeleteAndCreate(TNodeDTO dto, String certFingerprint) {
         validateAndUpdateType(dto, certFingerprint);
 
-        TNode existingUUIDNode = dataSource.findByUUIDAndSoftDeletedFalse(dto.getUuid());
-        if (existingUUIDNode != null) {
-            dataSource.softDeleteAudit(existingUUIDNode, certFingerprint);
+        TNode lastUpdated = dataSource.findLastUpdated(dto.getUuid());
+        if (lastUpdated != null) {
+            TNode lastDeleted = dataSource.findLastDeleted(dto.getUuid());
+            if (lastDeleted == null || lastUpdated.getLastUpdatedAt().isAfter(lastDeleted.getSoftDeletedAt())) {
+                dataSource.softDeleteAudit(lastUpdated, certFingerprint);
+            }
         }
 
         TNode node = dataSource.createOrUpdateAudit(dto.build(), certFingerprint);
@@ -34,19 +37,26 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
     public TNode softDelete(String uuid, String certFingerprint) {
         uuidOwnerService.validateOwnerUUID(certFingerprint, uuid);
 
-        TNode existingUUIDNode = dataSource.findByUUIDAndSoftDeletedFalse(uuid);
+        TNode existingUUIDNode = dataSource.findByUUID(uuid);
         if (existingUUIDNode == null) {
             throw new NotFoundException("Not found for soft delete");
         }
 
-        TNode node = dataSource.softDeleteAudit(existingUUIDNode, certFingerprint);
-        aggregateService.updateNode(node);
-        return node;
+        TNode lastUpdated = dataSource.findLastUpdated(uuid);
+        TNode lastDeleted = dataSource.findLastDeleted(uuid);
+        if (lastUpdated != null) {
+            if (lastDeleted == null || lastUpdated.getLastUpdatedAt().isAfter(lastDeleted.getSoftDeletedAt())) {
+                lastDeleted = dataSource.softDeleteAudit(lastUpdated, certFingerprint);
+                aggregateService.updateNode(lastDeleted);
+            }
+        }
+        return lastDeleted;
     }
 
     private void validateAndUpdateType(TNodeDTO dto, String certFingerprint) {
         UUIDOwner uuidOwner = uuidOwnerService.validateOwnerUUID(certFingerprint, dto.getUuid());
 
+        //if dto.getUuid() is another type then executing dataSource.findByUUID will not find node
         TNode existingUUIDNode = dataSource.findByUUID(dto.getUuid());
         if (existingUUIDNode == null) {
             //create
