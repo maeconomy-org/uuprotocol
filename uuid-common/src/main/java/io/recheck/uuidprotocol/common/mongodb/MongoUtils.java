@@ -24,9 +24,7 @@ public class MongoUtils {
 
             try {
                 Object value = field.get(pojo);
-                if (value != null) {
-                    doc.put(field.getName(), value);
-                }
+                doc.put(field.getName(), value);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Failed to access field: " + field.getName(), e);
             }

@@ -37,6 +37,8 @@ public class AggregateEntity extends Audit {
     private List<AggregateFile> files;
     private List<AggregateProperty> properties;
 
+    private List<UUObject> history;
+
     public static AggregateEntity buildFromUUObject(UUObject uuObject) {
         AggregateEntity aggregateEntity = new AggregateEntity();
         BeanUtils.copyProperties(uuObject, aggregateEntity);

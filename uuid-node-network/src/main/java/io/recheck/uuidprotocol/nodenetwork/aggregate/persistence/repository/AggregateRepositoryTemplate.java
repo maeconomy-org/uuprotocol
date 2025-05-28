@@ -4,20 +4,17 @@ import io.recheck.uuidprotocol.common.mongodb.MongoUtils;
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateFindDTO;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operations.AbstractOperation;
 import lombok.RequiredArgsConstructor;
-import org.bson.Document;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -27,7 +24,7 @@ public class AggregateRepositoryTemplate {
 
     private final MongoTemplate mongoTemplate;
 
-    public Page<AggregateEntity> find(Pageable pageable) {
+    public Page<AggregateEntity> find(AggregateFindDTO aggregateFindDTO) {
         /*
         Document projectStage = new Document("$project", new Document()
                 .append("uuid", 1)
@@ -46,26 +43,21 @@ public class AggregateRepositoryTemplate {
                 )))
         );
          */
-        Document projectStage = new Document("$project", new Document()
-                .append("uuid", 1)
-                .append("name", 1)
-                .append("version", 1)
-                .append("lastUpdatedAt", 1)
-                .append("files", 1)
-                .append("properties", 1)
-                .append("deepLastUpdatedAt", new Document("$max", List.of(
-                        "$createdAt"
-                )))
-        );
 
-        AggregationOperation projectOp = context -> projectStage;
+        Pageable pageable = PageRequest.of(aggregateFindDTO.getPage(), aggregateFindDTO.getSize());
 
         Aggregation aggregation = Aggregation.newAggregation(
-                projectOp,
-                Aggregation.sort(Sort.by(Sort.Direction.DESC, "deepLastUpdatedAt")),
+                Aggregation.sort(Sort.by(Sort.Direction.DESC, "$createdAt")),
                 Aggregation.skip(pageable.getOffset()),
                 Aggregation.limit(pageable.getPageSize())
         );
+
+        if (!aggregateFindDTO.getHasHistory()) {
+            aggregation.getPipeline().add(Aggregation.project().andExclude("history"));
+        }
+        if (StringUtils.hasText(aggregateFindDTO.getCreatedBy())) {
+            aggregation.getPipeline().add(Aggregation.match(Criteria.where("createdBy").is(aggregateFindDTO.getCreatedBy())));
+        }
 
         AggregationResults<AggregateEntity> results = mongoTemplate.aggregate(
                 aggregation, AggregateEntity.class.getSimpleName(), AggregateEntity.class
@@ -82,13 +74,16 @@ public class AggregateRepositoryTemplate {
         }
     }
 
-    public <TNode extends Node, VNode extends Node> void updateStatement(AbstractOperation operation, TNode parentNode, VNode childNode) {
+    public <TNode extends Node> void update(AbstractOperation operation, TNode uuNode) {
+        mongoTemplate.updateMulti(operation.getQuery(uuNode), operation.getUpdate(uuNode), AggregateEntity.class);
+    }
+
+    public <TNode extends Node, VNode extends Node> void update(AbstractOperation operation, TNode parentNode, VNode childNode) {
         mongoTemplate.updateMulti(operation.getQuery(parentNode), operation.getUpdate(childNode, parentNode), AggregateEntity.class);
     }
 
-
-    public <TNode extends Node> void updateNode(AbstractOperation operation, TNode uuNode) {
-        mongoTemplate.updateMulti(operation.getQuery(uuNode), operation.getUpdate(uuNode), AggregateEntity.class);
+    public <TNode extends Node, VNode extends Node> void update(AbstractOperation operation, TNode parentNode, List<VNode> childNodes) {
+        mongoTemplate.updateMulti(operation.getQuery(parentNode), operation.getUpdate(childNodes, parentNode), AggregateEntity.class);
     }
 
 
