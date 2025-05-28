@@ -4,10 +4,12 @@ import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import io.recheck.uuidprotocol.domain.node.model.UUStatements;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateFindDTO;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateOperationMap;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operations.AbstractBinaryOperation;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operations.AbstractOperation;
-import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operations.UpdatePushUUNodeToArray;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operations.UpdateSetArrayUUObject;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operations.UpdateUnsetUUObject;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.repository.AggregateRepository;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.repository.AggregateRepositoryTemplate;
 import io.recheck.uuidprotocol.nodenetwork.common.ClassResolver;
@@ -16,8 +18,6 @@ import io.recheck.uuidprotocol.nodenetwork.statements.UUStatementsClass;
 import io.recheck.uuidprotocol.nodenetwork.statements.UUStatementsDataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +38,8 @@ public class AggregateService {
         return aggregateRepository.findByAnyUuid(uuid.toLowerCase());
     }
 
-    public Page<AggregateEntity> findByLastUpdatedAtDeepest(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return aggregateRepositoryTemplate.find(pageable);
+    public Page<AggregateEntity> find(AggregateFindDTO aggregateFindDTO) {
+        return aggregateRepositoryTemplate.find(aggregateFindDTO);
     }
 
     public <TNode extends Node> void updateNode(TNode uuNode) {
@@ -49,23 +48,22 @@ public class AggregateService {
             List<AbstractOperation> operationList = AggregateOperationMap.getNodePath(uuNode.getClass());
             if (operationList!= null) {
                 for (AbstractOperation operation : operationList) {
-                    aggregateRepositoryTemplate.updateNode(operation, uuNode);
+                    aggregateRepositoryTemplate.update(operation, uuNode);
                 }
             }
 
+            //delete history list
+            aggregateRepositoryTemplate.update(new UpdateUnsetUUObject("history"), uuNode);
+            //find all deleted , push history list
             NodeDataSource<UUObject> uuObjectNodeDataSource = classResolver.getNodeDataSourceForType(UUObject.class);
-            UUObject historyNode = uuObjectNodeDataSource.findLastDeleted(uuNode.getUuid());
-            if (historyNode != null) {
-                UpdatePushUUNodeToArray<UUObject, UUObject> historyOp = new UpdatePushUUNodeToArray<>("history");
-                aggregateRepositoryTemplate.updateStatement(historyOp, uuNode, historyNode);
-            }
+            List<UUObject> historyNodes = uuObjectNodeDataSource.findDeleted(uuNode.getUuid());
+            aggregateRepositoryTemplate.update(new UpdateSetArrayUUObject("history"), uuNode, historyNodes);
         }
-
-        if (uuStatementsDataSource.exist(uuNode.getUuid())) {
+        else if (uuStatementsDataSource.exist(uuNode.getUuid())) {
             List<AbstractOperation> operationList = AggregateOperationMap.getNodePath(uuNode.getClass());
             if (operationList!= null) {
                 for (AbstractOperation operation : operationList) {
-                    aggregateRepositoryTemplate.updateNode(operation, uuNode);
+                    aggregateRepositoryTemplate.update(operation, uuNode);
                 }
             }
         }
@@ -85,7 +83,7 @@ public class AggregateService {
 
         AbstractBinaryOperation operation = AggregateOperationMap.getStatementsPath(new UUStatementsClass(parentNode.getClass(), uuStatement.getPredicate(), childNode.getClass()));
         if (operation != null) {
-            aggregateRepositoryTemplate.updateStatement(operation.getCreateStatement(), parentNode, childNode);
+            aggregateRepositoryTemplate.update(operation.getCreateStatement(), parentNode, childNode);
         }
 
     }
@@ -97,7 +95,7 @@ public class AggregateService {
 
         AbstractBinaryOperation operation = AggregateOperationMap.getStatementsPath(new UUStatementsClass(parentNode.getClass(), uuStatement.getPredicate(), childNode.getClass()));
         if (operation != null) {
-            aggregateRepositoryTemplate.updateStatement(operation.getDeleteStatement(), parentNode, childNode);
+            aggregateRepositoryTemplate.update(operation.getDeleteStatement(), parentNode, childNode);
         }
 
     }

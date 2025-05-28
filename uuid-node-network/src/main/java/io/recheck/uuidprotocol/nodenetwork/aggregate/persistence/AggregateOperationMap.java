@@ -18,7 +18,7 @@ public class AggregateOperationMap {
     static {
         nodePathMap = new LinkedMultiValueMap<>();
 
-        nodePathMap.put(UUObject.class, List.of(new UpdateSetUUObject()));
+        nodePathMap.put(UUObject.class, List.of(new UpdateSetUUObject("")));
         nodePathMap.put(UUProperty.class, List.of(new UpdateSetArrayUUNode<UUProperty>("properties")));
         nodePathMap.put(UUPropertyValue.class, List.of(new UpdateSetArrayUUNode<UUPropertyValue>("properties.values")));
         nodePathMap.put(UUFile.class, List.of(new UpdateSetArrayUUNode<UUFile>("files"),
