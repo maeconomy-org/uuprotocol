@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,12 +60,21 @@ public class FirestoreDataSource<T_COLLECTION> {
 
 
 
-    public T_COLLECTION findByDocumentId(String documentId, Map<String, Query.Direction> orderByFields) {
-        List<T_COLLECTION> result = whereEqualTo(FieldPath.documentId(), documentId, orderByFields);
-        if (!result.isEmpty()) {
-            return result.get(0);
+    public T_COLLECTION findByDocumentId(Object documentId, Map<String, Query.Direction> orderByFields) {
+        T_COLLECTION existingObject = null;
+        if (documentId != null) { // if == null >> Failed to complete request: java.util.concurrent.ExecutionException:
+                                                        // com.google.api.gax.rpc.InvalidArgumentException:
+                                                        // io.grpc.StatusRuntimeException: INVALID_ARGUMENT: __key__ filter value must be a Key
+            if (documentId instanceof CharSequence) {
+                if (StringUtils.hasText((CharSequence) documentId)) {
+                    existingObject = whereEqualTo(FieldPath.documentId(), documentId, orderByFields).stream().findFirst().orElse(null);
+                }
+            } else {
+                existingObject = whereEqualTo(FieldPath.documentId(), documentId, orderByFields).stream().findFirst().orElse(null);
+            }
         }
-        return null;
+
+        return existingObject;
     }
 
     public List<T_COLLECTION> findAll() {
@@ -98,8 +108,35 @@ public class FirestoreDataSource<T_COLLECTION> {
         return where(QueryBuilder.build(queryCompositeFilter), queryCompositeFilter.getOrderByFields());
     }
 
+    @SneakyThrows
+    public List<T_COLLECTION> where(Object pojo, Map<String, Query.Direction> orderByFields) {
+        List<Filter> filters = new ArrayList<>();
+
+        List<Field> allFields = ReflectionUtils.getAllFields(pojo.getClass());
+        for (Field field : allFields) {
+            Object value = field.get(pojo);
+            if (value != null) { //filter by all fields that has non empty value
+                if (value instanceof String) {
+                    if (!StringUtils.hasText((CharSequence) value)) {
+                        continue;
+                    }
+                }
+                filters.add(Filter.equalTo(field.getName(), value));
+            }
+        }
+        return where(Filter.and(filters.toArray(new Filter[0])), orderByFields);
+    }
+
+    public T_COLLECTION whereFindFirst(Filter filter) {
+        return where(filter, null).stream().findFirst().orElse(null);
+    }
+
     public List<T_COLLECTION> where(Filter filter) {
-        return documentSnapshotToObjects(getDocuments(filter, null));
+        return where(filter, null);
+    }
+
+    public T_COLLECTION whereFindFirst(Filter filter, Map<String, Query.Direction> orderByFields) {
+        return where(filter, orderByFields).stream().findFirst().orElse(null);
     }
 
     public List<T_COLLECTION> where(Filter filter, Map<String, Query.Direction> orderByFields) {

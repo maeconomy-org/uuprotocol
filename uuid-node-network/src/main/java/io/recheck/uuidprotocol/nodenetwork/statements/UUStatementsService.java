@@ -25,7 +25,7 @@ public class UUStatementsService {
     private final UUStatementsDataSource uuStatementsDataSource;
     private final AggregateService aggregateService;
 
-    public List<UUStatements> findOrCreate(List<UUStatementDTO> uuStatementDTOList, String certFingerprint) {
+    public List<UUStatements> findOrCreateWithOpposite(List<UUStatementDTO> uuStatementDTOList, String certFingerprint) {
         Set<UUStatementDTO> uuStatementsSet = new HashSet<>(uuStatementDTOList);
 
         List<UUStatements> uuStatementsList = new ArrayList<>();
@@ -33,20 +33,20 @@ public class UUStatementsService {
             //exclude validation of owning uuids - everyone could make statements
 //            validateOwnerUUID(uuStatementDTO, certFingerprint);
             validateStatement(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate(), uuStatementDTO.getObject());
-            uuStatementsList.add(findOrCreate(uuStatementDTO, certFingerprint));
-            uuStatementsList.add(findOrCreate(buildOpposite(uuStatementDTO), certFingerprint));
+            uuStatementsList.add(findOrCreate(uuStatementDTO.build(), certFingerprint));
+            uuStatementsList.add(findOrCreate(buildOpposite(uuStatementDTO).build(), certFingerprint));
         }
 
         return uuStatementsList;
     }
 
-    public List<UUStatements> softDelete(UUStatementDTO uuStatementDTO, String certFingerprint) {
+    public List<UUStatements> softDeleteWithOpposite(UUStatementDTO uuStatementDTO, String certFingerprint) {
         //exclude validation of owning uuids - everyone could soft delete statements
 //        validateOwnerUUID(uuStatementDTO, certFingerprint);
 
         List<UUStatements> uuStatementsList = new ArrayList<>();
-        uuStatementsList.add(softDelete_(uuStatementDTO, certFingerprint));
-        uuStatementsList.add(softDelete_(buildOpposite(uuStatementDTO), certFingerprint));
+        uuStatementsList.add(softDelete(uuStatementDTO.build(), certFingerprint));
+        uuStatementsList.add(softDelete(buildOpposite(uuStatementDTO).build(), certFingerprint));
 
         return uuStatementsList;
     }
@@ -55,26 +55,22 @@ public class UUStatementsService {
         return new UUStatementDTO(uuStatementDTO.getObject(), uuStatementDTO.getPredicate().getOpposite(uuStatementDTO.getPredicate()), uuStatementDTO.getSubject());
     }
 
-    private UUStatements findOrCreate(UUStatementDTO uuStatementDTO, String certFingerprint) {
-        UUStatements existingUUStatement = find(uuStatementDTO);
-        if (existingUUStatement == null) {
-            existingUUStatement = uuStatementsDataSource.createOrUpdateAudit(uuStatementDTO.build(), certFingerprint);
-            aggregateService.createStatement(existingUUStatement);
+    private UUStatements findOrCreate(UUStatements uuStatements, String certFingerprint) {
+        UUStatements lastUpdated = uuStatementsDataSource.findLastUpdated(uuStatements);
+        if (lastUpdated == null || lastUpdated.getSoftDeleted()) {
+            lastUpdated = uuStatementsDataSource.createOrUpdateAudit(uuStatements, certFingerprint);
+            aggregateService.createStatement(lastUpdated);
         }
-        return existingUUStatement;
+        return lastUpdated;
     }
 
-    private UUStatements softDelete_(UUStatementDTO uuStatementDTO, String certFingerprint) {
-        UUStatements existingUUStatement = find(uuStatementDTO);
-        if (existingUUStatement != null) {
-            existingUUStatement = uuStatementsDataSource.softDeleteAudit(existingUUStatement, certFingerprint);
-            aggregateService.deleteStatement(existingUUStatement);
+    private UUStatements softDelete(UUStatements uuStatements, String certFingerprint) {
+        UUStatements lastUpdated = uuStatementsDataSource.findLastUpdated(uuStatements);
+        if (lastUpdated != null && !lastUpdated.getSoftDeleted()) {
+            lastUpdated = uuStatementsDataSource.softDeleteAudit(lastUpdated, certFingerprint);
+            aggregateService.deleteStatement(lastUpdated);
         }
-        return existingUUStatement;
-    }
-
-    private UUStatements find(UUStatementDTO uuStatementDTO) {
-        return uuStatementsDataSource.find(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate().name(), uuStatementDTO.getObject());
+        return lastUpdated;
     }
 
     private void validateStatement(String subject, UUStatementPredicate predicate, String object) {

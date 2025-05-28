@@ -42,7 +42,7 @@ public class AggregateService {
     }
 
     public <TNode extends Node> void updateNode(TNode uuNode) {
-        if (uuStatementsDataSource.findByUUID(uuNode.getUuid()) != null) {
+        if (uuStatementsDataSource.exist(uuNode.getUuid())) {
             List<AbstractOperation> operationList = AggregateOperationMap.getNodePath(uuNode.getClass());
             if (operationList!= null) {
                 for (AbstractOperation operation : operationList) {
