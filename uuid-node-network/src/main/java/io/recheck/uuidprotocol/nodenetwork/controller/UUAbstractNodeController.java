@@ -37,10 +37,4 @@ public class UUAbstractNodeController<TNode extends Node, TNodeDTO extends NodeD
         return ResponseEntity.ok(dataSource.where(nodeFindDTO));
     }
 
-    @GetMapping({"/own"})
-    public ResponseEntity<Object> findBySoftDeletedOwn(@Valid NodeFindDTO nodeFindDTO, @AuthenticationPrincipal X509UserDetails user) {
-        nodeFindDTO.setCreatedBy(user.getCertFingerprint());
-        return ResponseEntity.ok(dataSource.where(nodeFindDTO));
-    }
-
 }

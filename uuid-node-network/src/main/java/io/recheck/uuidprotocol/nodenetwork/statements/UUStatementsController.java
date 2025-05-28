@@ -35,10 +35,4 @@ public class UUStatementsController {
         return ResponseEntity.ok(uuStatementsDataSource.where(uuStatementFindDTO));
     }
 
-    @GetMapping({"/own"})
-    public ResponseEntity<Object> findBySoftDeletedOwn(@Valid UUStatementFindDTO uuStatementFindDTO, @AuthenticationPrincipal X509UserDetails user) {
-        uuStatementFindDTO.setCreatedBy(user.getCertFingerprint());
-        return ResponseEntity.ok(uuStatementsDataSource.where(uuStatementFindDTO));
-    }
-
 }

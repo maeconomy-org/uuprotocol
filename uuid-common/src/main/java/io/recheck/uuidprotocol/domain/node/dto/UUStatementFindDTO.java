@@ -1,6 +1,5 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
 import io.recheck.uuidprotocol.domain.node.model.UUStatements;
 import jakarta.validation.constraints.Pattern;
@@ -24,7 +23,6 @@ public class UUStatementFindDTO {
 
     private Boolean softDeleted;
 
-    @JsonIgnore
     private String createdBy;
 
     public UUStatements build() {
