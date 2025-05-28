@@ -1,6 +1,5 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +15,6 @@ public class NodeFindDTO {
 
     private Boolean softDeleted;
 
-    @JsonIgnore
     private String createdBy;
 
 }
