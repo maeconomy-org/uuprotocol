@@ -31,6 +31,7 @@ public class FirestoreDataSource<T_COLLECTION> {
         return firestore.collection(collectionType.getSimpleName());
     }
 
+    @SneakyThrows
     public T_COLLECTION createOrUpdate(T_COLLECTION pojo) {
         CollectionReference collectionReference = getCollection();
         DocumentReference documentReference;
@@ -43,6 +44,7 @@ public class FirestoreDataSource<T_COLLECTION> {
             setId(pojo, documentReference.getId());
         }
         documentReference.set(pojo);
+        Thread.sleep(3000L);
         return pojo;
     }
 
