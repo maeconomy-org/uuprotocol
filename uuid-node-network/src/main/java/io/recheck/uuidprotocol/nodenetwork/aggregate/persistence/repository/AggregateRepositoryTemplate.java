@@ -27,7 +27,8 @@ public class AggregateRepositoryTemplate {
 
     private final MongoTemplate mongoTemplate;
 
-    public Page<AggregateEntity> findByLastUpdatedAtDeepest(Pageable pageable) {
+    public Page<AggregateEntity> find(Pageable pageable) {
+        /*
         Document projectStage = new Document("$project", new Document()
                 .append("uuid", 1)
                 .append("name", 1)
@@ -42,6 +43,18 @@ public class AggregateRepositoryTemplate {
                         new Document("$max", "$properties.values.lastUpdatedAt"),
                         new Document("$max", "$properties.files.lastUpdatedAt"),
                         new Document("$max", "$properties.values.files.lastUpdatedAt")
+                )))
+        );
+         */
+        Document projectStage = new Document("$project", new Document()
+                .append("uuid", 1)
+                .append("name", 1)
+                .append("version", 1)
+                .append("lastUpdatedAt", 1)
+                .append("files", 1)
+                .append("properties", 1)
+                .append("deepLastUpdatedAt", new Document("$max", List.of(
+                        "$createdAt"
                 )))
         );
 

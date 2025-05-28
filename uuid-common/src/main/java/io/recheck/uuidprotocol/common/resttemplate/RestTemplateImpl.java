@@ -5,7 +5,6 @@ import io.recheck.uuidprotocol.common.resttemplate.model.ResponseSpec;
 import io.recheck.uuidprotocol.common.resttemplate.model.ServerSpec;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -42,9 +41,7 @@ public class RestTemplateImpl {
 
         if (requestSpec.getResponseBodyTypeReference() != null) {
             ResponseEntity<Iterable<RES>> responseEntity = restTemplate.exchange(requestEntity, requestSpec.getResponseBodyTypeReference());
-            if (requestSpec.getHttpMethod().compareTo(HttpMethod.GET) != 0) {
-                Thread.sleep(3000);
-            }
+
             ResponseSpec<Iterable<RES>> responseSpec = new ResponseSpec<>();
             responseSpec.setBody(responseEntity.getBody());
             responseSpec.setHttpHeaders(responseEntity.getHeaders());
@@ -52,9 +49,7 @@ public class RestTemplateImpl {
         }
         else {
             ResponseEntity<RES> responseEntity = restTemplate.exchange(requestEntity, requestSpec.getResponseBodyClass());
-            if (requestSpec.getHttpMethod().compareTo(HttpMethod.GET) != 0) {
-                Thread.sleep(3000);
-            }
+
             ResponseSpec<RES> responseSpec = new ResponseSpec<>();
             responseSpec.setBody(responseEntity.getBody());
             responseSpec.setHttpHeaders(responseEntity.getHeaders());
