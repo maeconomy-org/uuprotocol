@@ -24,6 +24,8 @@ public class AggregateEntity extends Audit {
     private String uuid;
     private String name;
     private String version;
+    private String abbreviation;
+    private String description;
 
     private List<String> parents;
     private List<String> children;
