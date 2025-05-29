@@ -82,9 +82,5 @@ public class AggregateRepositoryTemplate {
         mongoTemplate.updateMulti(operation.getQuery(parentNode), operation.getUpdate(childNode, parentNode), AggregateEntity.class);
     }
 
-    public <TNode extends Node, VNode extends Node> void update(AbstractOperation operation, TNode parentNode, List<VNode> childNodes) {
-        mongoTemplate.updateMulti(operation.getQuery(parentNode), operation.getUpdate(childNodes, parentNode), AggregateEntity.class);
-    }
-
 
 }

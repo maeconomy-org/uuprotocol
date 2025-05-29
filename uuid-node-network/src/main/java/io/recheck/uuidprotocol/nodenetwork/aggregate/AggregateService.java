@@ -57,7 +57,9 @@ public class AggregateService {
             //find all deleted , push history list
             NodeDataSource<UUObject> uuObjectNodeDataSource = classResolver.getNodeDataSourceForType(UUObject.class);
             List<UUObject> historyNodes = uuObjectNodeDataSource.findDeleted(uuNode.getUuid());
-            aggregateRepositoryTemplate.update(new UpdateSetArrayUUObject("history"), uuNode, historyNodes);
+            for (UUObject historyNode : historyNodes) {
+                aggregateRepositoryTemplate.update(new UpdateSetArrayUUObject("history"), uuNode, historyNode);
+            }
         }
         else if (uuStatementsDataSource.exist(uuNode.getUuid())) {
             List<AbstractOperation> operationList = AggregateOperationMap.getNodePath(uuNode.getClass());
@@ -73,13 +75,6 @@ public class AggregateService {
         Pair<TNode, VNode> nodes = getNodes(uuStatement);
         TNode parentNode = nodes.getFirst();
         VNode childNode = nodes.getSecond();
-
-        if (parentNode instanceof UUObject) {
-            aggregateRepositoryTemplate.insertIfNotFound((UUObject) parentNode);
-        }
-        if (childNode instanceof UUObject) {
-            aggregateRepositoryTemplate.insertIfNotFound((UUObject) childNode);
-        }
 
         AbstractBinaryOperation operation = AggregateOperationMap.getStatementsPath(new UUStatementsClass(parentNode.getClass(), uuStatement.getPredicate(), childNode.getClass()));
         if (operation != null) {
