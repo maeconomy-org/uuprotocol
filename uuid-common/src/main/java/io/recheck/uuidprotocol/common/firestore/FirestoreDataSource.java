@@ -44,7 +44,7 @@ public class FirestoreDataSource<T_COLLECTION> {
             setId(pojo, documentReference.getId());
         }
         documentReference.set(pojo);
-        Thread.sleep(3000L);
+        Thread.sleep(1000L);
         return pojo;
     }
 
