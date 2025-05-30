@@ -1,13 +1,10 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate.model;
 
 import io.recheck.uuidprotocol.domain.node.model.UUObject;
-import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -16,16 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document("AggregateEntity")
-public class AggregateEntity extends Audit {
-
-    @Id
-    private ObjectId objectId;
-
-    private String uuid;
-    private String name;
-    private String version;
-    private String abbreviation;
-    private String description;
+public class AggregateEntity extends UUObject {
 
     private List<String> parents;
     private List<String> children;
