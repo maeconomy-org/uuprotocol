@@ -7,6 +7,7 @@ import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateFindDTO;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operations.AbstractOperation;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -25,25 +26,6 @@ public class AggregateRepositoryTemplate {
     private final MongoTemplate mongoTemplate;
 
     public Page<AggregateEntity> find(AggregateFindDTO aggregateFindDTO) {
-        /*
-        Document projectStage = new Document("$project", new Document()
-                .append("uuid", 1)
-                .append("name", 1)
-                .append("version", 1)
-                .append("lastUpdatedAt", 1)
-                .append("files", 1)
-                .append("properties", 1)
-                .append("deepLastUpdatedAt", new Document("$max", List.of(
-                        "$lastUpdatedAt",
-                        new Document("$max", "$files.lastUpdatedAt"),
-                        new Document("$max", "$properties.lastUpdatedAt"),
-                        new Document("$max", "$properties.values.lastUpdatedAt"),
-                        new Document("$max", "$properties.files.lastUpdatedAt"),
-                        new Document("$max", "$properties.values.files.lastUpdatedAt")
-                )))
-        );
-         */
-
         Pageable pageable = PageRequest.of(aggregateFindDTO.getPage(), aggregateFindDTO.getSize());
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -55,15 +37,29 @@ public class AggregateRepositoryTemplate {
         if (!aggregateFindDTO.getHasHistory()) {
             aggregation.getPipeline().add(Aggregation.project().andExclude("history"));
         }
+
+        Aggregation aggregationCount = Aggregation.newAggregation(Aggregation.count().as("total"));
+        AggregationResults<Document> countResults = mongoTemplate.aggregate(aggregationCount, AggregateEntity.class.getSimpleName(), Document.class);
+        int total = countResults.getMappedResults().stream()
+                .findFirst()
+                .map(d -> d.getInteger("total"))
+                .orElse(0);
+
         if (StringUtils.hasText(aggregateFindDTO.getCreatedBy())) {
             aggregation.getPipeline().add(Aggregation.match(Criteria.where("createdBy").is(aggregateFindDTO.getCreatedBy())));
+
+            aggregationCount = Aggregation.newAggregation(Aggregation.match(Criteria.where("createdBy").is(aggregateFindDTO.getCreatedBy())));
+            countResults = mongoTemplate.aggregate(aggregationCount, AggregateEntity.class.getSimpleName(), Document.class);
+            total = countResults.getMappedResults().size();
         }
+
 
         AggregationResults<AggregateEntity> results = mongoTemplate.aggregate(
                 aggregation, AggregateEntity.class.getSimpleName(), AggregateEntity.class
         );
 
-        long total = mongoTemplate.count(new Query(), AggregateEntity.class);
+
+
         return new PageImpl<>(results.getMappedResults(), pageable, total);
     }
 
