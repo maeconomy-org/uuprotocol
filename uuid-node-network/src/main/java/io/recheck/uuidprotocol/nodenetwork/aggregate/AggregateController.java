@@ -3,6 +3,7 @@ package io.recheck.uuidprotocol.nodenetwork.aggregate;
 
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateFindDTO;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.repository.AggregateRepositoryTemplate;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,16 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/aggregate")
 public class AggregateController {
 
-    private final AggregateService aggregateService;
+    private final AggregateRepositoryTemplate aggregateRepositoryTemplate;
 
     @GetMapping({"/{uuid}"})
     public ResponseEntity<Object> findByAnyUUID(@PathVariable @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") String uuid) {
-        return ResponseEntity.ok(aggregateService.findByAnyUuid(uuid));
+        return ResponseEntity.ok(aggregateRepositoryTemplate.findByAnyUuid(uuid));
     }
 
     @GetMapping
     public Page<AggregateEntity> find(AggregateFindDTO aggregateFindDTO) {
-        return aggregateService.find(aggregateFindDTO);
+        return aggregateRepositoryTemplate.find(aggregateFindDTO);
     }
 
 }

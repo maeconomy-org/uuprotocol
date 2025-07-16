@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.nodenetwork.import_;
+package io.recheck.uuidprotocol.nodenetwork.aggregate.imports;
 
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
@@ -7,7 +7,7 @@ import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateFile;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateProperty;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregatePropertyValue;
-import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.repository.AggregateRepository;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.repository.AggregateRepositoryTemplate;
 import io.recheck.uuidprotocol.nodenetwork.datasource.UUFileDataSource;
 import io.recheck.uuidprotocol.nodenetwork.datasource.UUObjectDataSource;
 import io.recheck.uuidprotocol.nodenetwork.datasource.UUPropertyDataSource;
@@ -30,7 +30,7 @@ public class ImportService {
     private final UUFileDataSource uuFileDataSource;
     private final UUStatementsDataSource uuStatementsDataSource;
 
-    private final AggregateRepository aggregateRepository;
+    private final AggregateRepositoryTemplate aggregateRepositoryTemplate;
 
     private final UUIDOwnerImportService uuidOwnerImportService;
 
@@ -74,7 +74,7 @@ public class ImportService {
             }
         }
 
-        aggregateRepository.saveAll(aggregateEntityList);
+        aggregateRepositoryTemplate.saveAll(aggregateEntityList);
 
     }
 

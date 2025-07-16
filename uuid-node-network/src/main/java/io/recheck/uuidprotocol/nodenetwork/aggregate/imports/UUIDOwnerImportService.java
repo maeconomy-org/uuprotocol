@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.nodenetwork.import_;
+package io.recheck.uuidprotocol.nodenetwork.aggregate.imports;
 
 import io.recheck.uuidprotocol.common.exceptions.ForbiddenException;
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
