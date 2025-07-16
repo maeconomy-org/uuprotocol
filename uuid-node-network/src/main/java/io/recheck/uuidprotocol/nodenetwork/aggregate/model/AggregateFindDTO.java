@@ -14,6 +14,8 @@ public class AggregateFindDTO {
 
     private String createdBy;
 
+    private Boolean hasChildrenFull = false;
+
     private Boolean hasHistory = false;
 
 }

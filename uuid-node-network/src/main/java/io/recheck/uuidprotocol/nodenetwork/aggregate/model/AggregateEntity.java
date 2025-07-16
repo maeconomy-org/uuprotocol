@@ -17,6 +17,7 @@ public class AggregateEntity extends UUObject {
 
     private List<String> parents;
     private List<String> children;
+    private List<AggregateEntity> childrenFull;
 
     private List<String> inputs;
     private List<String> outputs;
