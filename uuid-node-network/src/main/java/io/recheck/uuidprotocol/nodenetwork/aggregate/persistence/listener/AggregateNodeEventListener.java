@@ -1,10 +1,8 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener;
 
 import io.recheck.uuidprotocol.common.mongodb.query.UpdateArrayDoc;
-import io.recheck.uuidprotocol.domain.node.model.Node;
-import io.recheck.uuidprotocol.domain.node.model.UUFile;
-import io.recheck.uuidprotocol.domain.node.model.UUProperty;
-import io.recheck.uuidprotocol.domain.node.model.UUPropertyValue;
+import io.recheck.uuidprotocol.common.mongodb.query.UpdateDoc;
+import io.recheck.uuidprotocol.domain.node.model.*;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateRepository;
 import io.recheck.uuidprotocol.nodenetwork.audit.AuditEventListener;
 import io.recheck.uuidprotocol.nodenetwork.statements.UUStatementsDataSource;
@@ -23,6 +21,7 @@ public class AggregateNodeEventListener<TNode extends Node> implements AuditEven
     protected final AggregateRepository aggregateRepository;
 
     static private MultiValueMap<Class<?>, UpdateArrayDoc> nodeUpdateArrayDocMap;
+    static private MultiValueMap<Class<?>, UpdateDoc> nodeUpdateDocMap;
 
     static {
         nodeUpdateArrayDocMap = new LinkedMultiValueMap<>();
@@ -32,6 +31,9 @@ public class AggregateNodeEventListener<TNode extends Node> implements AuditEven
         nodeUpdateArrayDocMap.put(UUFile.class, List.of(new UpdateArrayDoc("files", "uuid", "uuid"),
                 new UpdateArrayDoc("properties.files", "uuid", "uuid"),
                 new UpdateArrayDoc("properties.values.files", "uuid", "uuid")));
+
+        nodeUpdateDocMap = new LinkedMultiValueMap<>();
+        nodeUpdateDocMap.put(UUAddress.class, List.of(new UpdateDoc("address")));
     }
 
     @Override
@@ -47,6 +49,14 @@ public class AggregateNodeEventListener<TNode extends Node> implements AuditEven
                 for (UpdateArrayDoc updateArrayDoc : updateArrayDocList) {
                     Query query = new Query(Criteria.where(updateArrayDoc.getArrayDocFullPath() + ".uuid").is(uuNode.getUuid()));
                     aggregateRepository.update(query, updateArrayDoc.setArrayDoc(uuNode.getUuid(), uuNode));
+                }
+            }
+
+            List<UpdateDoc> updateDocList = nodeUpdateDocMap.get(uuNode.getClass());
+            if (updateDocList != null) {
+                for (UpdateDoc updateDoc : updateDocList) {
+                    Query query = new Query(Criteria.where(updateDoc.getParentPath() + ".uuid").is(uuNode.getUuid()));
+                    aggregateRepository.update(query, updateDoc.setDoc(uuNode));
                 }
             }
         }

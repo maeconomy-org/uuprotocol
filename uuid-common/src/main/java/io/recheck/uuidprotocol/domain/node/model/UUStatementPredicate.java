@@ -9,7 +9,8 @@ public enum UUStatementPredicate {
     IS_MODEL_OF, IS_INSTANCE_MODEL_OF,
     IS_PROPERTY_OF, HAS_PROPERTY,
     IS_VALUE_OF, HAS_VALUE,
-    IS_FILE_OF, HAS_FILE;
+    IS_FILE_OF, HAS_FILE,
+    HAS_ADDRESS, IS_ADDRESS_OF;
 
     private static Map<UUStatementPredicate, UUStatementPredicate> oppositePredicateOf = Map.ofEntries(
             Map.entry(UUStatementPredicate.IS_PARENT_OF, UUStatementPredicate.IS_CHILD_OF),
@@ -28,7 +29,10 @@ public enum UUStatementPredicate {
             Map.entry(UUStatementPredicate.HAS_VALUE, UUStatementPredicate.IS_VALUE_OF),
 
             Map.entry(UUStatementPredicate.IS_FILE_OF, UUStatementPredicate.HAS_FILE),
-            Map.entry(UUStatementPredicate.HAS_FILE, UUStatementPredicate.IS_FILE_OF)
+            Map.entry(UUStatementPredicate.HAS_FILE, UUStatementPredicate.IS_FILE_OF),
+
+            Map.entry(UUStatementPredicate.HAS_ADDRESS, UUStatementPredicate.IS_ADDRESS_OF),
+            Map.entry(UUStatementPredicate.IS_ADDRESS_OF, UUStatementPredicate.HAS_ADDRESS)
     );
 
     public UUStatementPredicate getOpposite(UUStatementPredicate uuStatementPredicate) {

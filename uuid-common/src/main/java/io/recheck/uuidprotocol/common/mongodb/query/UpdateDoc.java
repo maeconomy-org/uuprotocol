@@ -13,6 +13,14 @@ public class UpdateDoc {
 
     private final String path;
 
+    public String getParentPath() {
+        String parentPath = "";
+        if (path.lastIndexOf(".") > 0) {
+            parentPath = path.substring(0,path.lastIndexOf("."));
+        }
+        return parentPath;
+    }
+
     public Update setDoc(Object objectDoc) {
         String fullPath = "";
         if (StringUtils.hasText(path)) {

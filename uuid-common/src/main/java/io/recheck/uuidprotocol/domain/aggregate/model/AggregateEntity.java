@@ -2,6 +2,7 @@ package io.recheck.uuidprotocol.domain.aggregate.model;
 
 import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,7 +13,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Document("AggregateEntity")
+@EqualsAndHashCode(callSuper=false)
 public class AggregateEntity extends AggregateUUObject {
+
+    private AggregateUUAddress address;
 
     private List<String> parents = new ArrayList<>();
     private List<String> children = new ArrayList<>();
