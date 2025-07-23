@@ -34,6 +34,9 @@ public class UUStatementsClassPredicateMap {
         map.add(UUStatementPredicate.HAS_FILE, new UUStatementsClass(UUPropertyValue.class, UUStatementPredicate.HAS_FILE, UUFile.class));
         map.add(UUStatementPredicate.HAS_FILE, new UUStatementsClass(UUProperty.class, UUStatementPredicate.HAS_FILE, UUFile.class));
         map.add(UUStatementPredicate.HAS_FILE, new UUStatementsClass(UUObject.class, UUStatementPredicate.HAS_FILE, UUFile.class));
+
+        map.add(UUStatementPredicate.HAS_ADDRESS, new UUStatementsClass(UUObject.class, UUStatementPredicate.HAS_ADDRESS, UUAddress.class));
+        map.add(UUStatementPredicate.IS_ADDRESS_OF, new UUStatementsClass(UUAddress.class, UUStatementPredicate.IS_ADDRESS_OF, UUObject.class));
     }
     
     static public List<UUStatementsClass> get(UUStatementPredicate uuStatementPredicate) {

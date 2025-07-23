@@ -3,10 +3,7 @@ package io.recheck.uuidprotocol.nodenetwork.aggregate.imports;
 import io.recheck.uuidprotocol.domain.aggregate.model.*;
 import io.recheck.uuidprotocol.domain.node.model.*;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateRepository;
-import io.recheck.uuidprotocol.nodenetwork.node.persistence.UUFileDataSource;
-import io.recheck.uuidprotocol.nodenetwork.node.persistence.UUObjectDataSource;
-import io.recheck.uuidprotocol.nodenetwork.node.persistence.UUPropertyDataSource;
-import io.recheck.uuidprotocol.nodenetwork.node.persistence.UUPropertyValueDataSource;
+import io.recheck.uuidprotocol.nodenetwork.node.persistence.*;
 import io.recheck.uuidprotocol.nodenetwork.statements.UUStatementsDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +20,7 @@ public class ImportService {
     private final UUPropertyDataSource uuPropertyDataSource;
     private final UUPropertyValueDataSource uuPropertyValueDataSource;
     private final UUFileDataSource uuFileDataSource;
+    private final UUAddressDataSource uuAddressDataSource;
     private final UUStatementsDataSource uuStatementsDataSource;
 
     private final AggregateRepository aggregateRepository;
@@ -33,10 +31,14 @@ public class ImportService {
 
 
     public void saveAll(List<AggregateEntity> aggregateEntityList, String certFingerprint) {
-        //updateNodeType!!!!!
         for (AggregateEntity aggObject : aggregateEntityList) {
             UUObject uuObject = saveUUObject(aggObject, certFingerprint);
             setAggNode(aggObject, uuObject);
+
+            if (aggObject.getAddress() != null) {
+                UUAddress uuAddress = saveUUAddress(aggObject.getAddress(), uuObject.getUuid(), certFingerprint);
+                setAggNode(aggObject.getAddress(), uuAddress);
+            }
 
             if (aggObject.getFiles() != null) {
                 for (AggregateUUFile aggFile : aggObject.getFiles()) {
@@ -86,9 +88,34 @@ public class ImportService {
         aggNode.setLastUpdatedBy(uuNode.getLastUpdatedBy());
     }
 
+    private UUAddress saveUUAddress(AggregateUUAddress aggAddress, String uuObjectStatementUUID, String certFingerprint) {
+        UUAddress uuAddress = new UUAddress();
+        uuAddress.setUuid(uuidOwnerImportService.createUUID(certFingerprint, UUAddress.class.getSimpleName()).getUuid());
+        uuAddress.setFullAddress(aggAddress.getFullAddress());
+        uuAddress.setStreet(aggAddress.getStreet());
+        uuAddress.setHouseNumber(aggAddress.getHouseNumber());
+        uuAddress.setCity(aggAddress.getCity());
+        uuAddress.setPostalCode(aggAddress.getPostalCode());
+        uuAddress.setCountry(aggAddress.getCountry());
+        uuAddress.setState(aggAddress.getState());
+        uuAddress.setDistrict(aggAddress.getDistrict());
+
+        uuAddress = uuAddressDataSource.createAudit(uuAddress, certFingerprint);
+
+        UUStatements uuStatement = new UUStatements();
+        uuStatement.setSubject(uuObjectStatementUUID);
+        uuStatement.setPredicate(UUStatementPredicate.HAS_ADDRESS);
+        uuStatement.setObject(uuAddress.getUuid());
+
+        uuStatementsDataSource.createAudit(uuStatement, certFingerprint);
+        uuStatementsDataSource.createAudit(buildOpposite(uuStatement), certFingerprint);
+
+        return uuAddress;
+    }
+
     private UUObject saveUUObject(AggregateEntity aggObject, String certFingerprint) {
         UUObject uuObject = new UUObject();
-        uuObject.setUuid(uuidOwnerImportService.createUUID(certFingerprint, uuObjectDataSource.getCollectionType().getSimpleName()).getUuid());
+        uuObject.setUuid(uuidOwnerImportService.createUUID(certFingerprint, UUObject.class.getSimpleName()).getUuid());
         uuObject.setName(aggObject.getName());
         uuObject.setAbbreviation(aggObject.getAbbreviation());
         uuObject.setVersion(aggObject.getVersion());
@@ -99,7 +126,7 @@ public class ImportService {
 
     private UUFile saveUUFile(AggregateUUFile aggFile, String nodeStatementUUID, String certFingerprint) {
         UUFile uuFile = new UUFile();
-        uuFile.setUuid(uuidOwnerImportService.createUUID(certFingerprint, uuFileDataSource.getCollectionType().getSimpleName()).getUuid());
+        uuFile.setUuid(uuidOwnerImportService.createUUID(certFingerprint, UUFile.class.getSimpleName()).getUuid());
         uuFile.setFileReference(aggFile.getFileReference());
         uuFile.setFileName(aggFile.getFileName());
         uuFile.setLabel(aggFile.getLabel());
@@ -119,7 +146,7 @@ public class ImportService {
 
     private UUProperty saveUUProperty(AggregateUUProperty aggProperty, String uuObjectStatementUUID, String certFingerprint) {
         UUProperty uuProperty = new UUProperty();
-        uuProperty.setUuid(uuidOwnerImportService.createUUID(certFingerprint, uuPropertyDataSource.getCollectionType().getSimpleName()).getUuid());
+        uuProperty.setUuid(uuidOwnerImportService.createUUID(certFingerprint, UUProperty.class.getSimpleName()).getUuid());
         uuProperty.setKey(aggProperty.getKey());
         uuProperty.setVersion(aggProperty.getVersion());
         uuProperty.setLabel(aggProperty.getLabel());
@@ -146,7 +173,7 @@ public class ImportService {
 
     private UUPropertyValue saveUUPropertyValue(AggregateUUPropertyValue aggPropertyValue, String uuPropertyStatementUUID, String certFingerprint) {
         UUPropertyValue uuPropertyValue = new UUPropertyValue();
-        uuPropertyValue.setUuid(uuidOwnerImportService.createUUID(certFingerprint, uuPropertyValueDataSource.getCollectionType().getSimpleName()).getUuid());
+        uuPropertyValue.setUuid(uuidOwnerImportService.createUUID(certFingerprint, UUPropertyValue.class.getSimpleName()).getUuid());
         uuPropertyValue.setValue(aggPropertyValue.getValue());
         uuPropertyValue.setValueTypeCast(aggPropertyValue.getValueTypeCast());
         uuPropertyValue.setSourceType(aggPropertyValue.getSourceType());
