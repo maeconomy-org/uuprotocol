@@ -7,7 +7,7 @@ import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
 import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
 import io.recheck.uuidprotocol.domain.node.model.UUStatements;
 import io.recheck.uuidprotocol.domain.owner.model.UUIDOwner;
-import io.recheck.uuidprotocol.nodenetwork.aggregate.AggregateService;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener.AggregateUUStatementsEventListener;
 import io.recheck.uuidprotocol.nodenetwork.owner.UUIDOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ import java.util.Set;
 public class UUStatementsService {
 
     private final UUIDOwnerService uuidOwnerService;
+    private final AggregateUUStatementsEventListener aggregateUUStatementsEventListener;
     private final UUStatementsDataSource uuStatementsDataSource;
-    private final AggregateService aggregateService;
 
     public List<UUStatements> findOrCreateWithOpposite(List<UUStatementDTO> uuStatementDTOList, String certFingerprint) {
         Set<UUStatementDTO> uuStatementsSet = new HashSet<>(uuStatementDTOList);
@@ -58,17 +58,19 @@ public class UUStatementsService {
     private UUStatements findOrCreate(UUStatements uuStatements, String certFingerprint) {
         UUStatements lastUpdated = uuStatementsDataSource.findLastUpdated(uuStatements);
         if (lastUpdated == null || lastUpdated.getSoftDeleted()) {
-            lastUpdated = uuStatementsDataSource.createOrUpdateAudit(uuStatements, certFingerprint);
-            aggregateService.createStatement(lastUpdated);
+            lastUpdated = uuStatementsDataSource.createAudit(uuStatements, certFingerprint);
+            aggregateUUStatementsEventListener.postCreate(lastUpdated);
         }
         return lastUpdated;
     }
 
     private UUStatements softDelete(UUStatements uuStatements, String certFingerprint) {
         UUStatements lastUpdated = uuStatementsDataSource.findLastUpdated(uuStatements);
-        if (lastUpdated != null && !lastUpdated.getSoftDeleted()) {
+        if (lastUpdated == null) {
+            throw new NotFoundException("Not found for soft delete");
+        }
+        else if (!lastUpdated.getSoftDeleted()) {
             lastUpdated = uuStatementsDataSource.softDeleteAudit(lastUpdated, certFingerprint);
-            aggregateService.deleteStatement(lastUpdated);
         }
         return lastUpdated;
     }

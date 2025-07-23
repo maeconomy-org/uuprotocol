@@ -1,9 +1,9 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate;
 
 
-import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
-import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateFindDTO;
-import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.repository.AggregateRepositoryTemplate;
+import io.recheck.uuidprotocol.domain.aggregate.dto.AggregateFindDTO;
+import io.recheck.uuidprotocol.domain.aggregate.model.AggregateEntity;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateRepository;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,19 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/aggregate")
+@RequestMapping(value = "/api/Aggregate")
 public class AggregateController {
 
-    private final AggregateRepositoryTemplate aggregateRepositoryTemplate;
+    private final AggregateRepository aggregateRepository;
 
     @GetMapping({"/{uuid}"})
     public ResponseEntity<Object> findByAnyUUID(@PathVariable @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") String uuid) {
-        return ResponseEntity.ok(aggregateRepositoryTemplate.findByAnyUuid(uuid));
+        return ResponseEntity.ok(aggregateRepository.findByAnyUuid(uuid));
     }
 
     @GetMapping
     public Page<AggregateEntity> find(AggregateFindDTO aggregateFindDTO) {
-        return aggregateRepositoryTemplate.find(aggregateFindDTO);
+        return aggregateRepository.find(aggregateFindDTO);
     }
 
 }

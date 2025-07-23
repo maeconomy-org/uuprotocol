@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api")
 public class CommonController {
 
-    private final UUIDOwnerService uuidOwnerService;
-
     @GetMapping({"/cert"})
     public ResponseEntity<Object> getCert(@AuthenticationPrincipal X509UserDetails user) {
         return ResponseEntity.ok(user);

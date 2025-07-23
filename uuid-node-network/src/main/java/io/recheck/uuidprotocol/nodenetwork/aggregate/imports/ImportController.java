@@ -1,6 +1,6 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate.imports;
 
-import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
+import io.recheck.uuidprotocol.domain.aggregate.model.AggregateEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/Import")
+@RequestMapping(value = "/api/Aggregate/Import")
 @RequiredArgsConstructor
 public class ImportController {
 
