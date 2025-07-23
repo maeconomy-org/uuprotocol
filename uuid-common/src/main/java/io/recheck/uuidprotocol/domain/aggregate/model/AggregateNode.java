@@ -3,7 +3,7 @@ package io.recheck.uuidprotocol.domain.aggregate.model;
 import lombok.Data;
 
 @Data
-public class AggregatedNode extends AggregatedAudit {
+public class AggregateNode extends AggregateAudit {
 
     private String uuid;
 

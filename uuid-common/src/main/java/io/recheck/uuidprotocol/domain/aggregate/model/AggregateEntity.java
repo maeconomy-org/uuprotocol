@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Document("AggregateEntity")
-public class AggregateEntity extends AggregatedUUObject {
+public class AggregateEntity extends AggregateUUObject {
 
     private List<String> parents = new ArrayList<>();
     private List<String> children = new ArrayList<>();
@@ -24,10 +24,10 @@ public class AggregateEntity extends AggregatedUUObject {
     private List<String> models = new ArrayList<>();
     private List<String> instances = new ArrayList<>();
 
-    private List<AggregateFile> files = new ArrayList<>();
-    private List<AggregateProperty> properties = new ArrayList<>();
+    private List<AggregateUUFile> files = new ArrayList<>();
+    private List<AggregateUUProperty> properties = new ArrayList<>();
 
-    private List<AggregatedUUObject> history = new ArrayList<>();
+    private List<AggregateUUObject> history = new ArrayList<>();
 
     public static AggregateEntity buildFromUUObject(UUObject uuObject) {
         AggregateEntity aggregateEntity = new AggregateEntity();

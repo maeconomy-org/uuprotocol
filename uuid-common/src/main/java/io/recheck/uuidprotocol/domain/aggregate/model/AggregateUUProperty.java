@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class AggregateProperty extends AggregatedNode {
+public class AggregateUUProperty extends AggregateNode {
 
     private String key;
 
@@ -20,7 +20,7 @@ public class AggregateProperty extends AggregatedNode {
     private int processingOrderPosition;
     private int viewOrderPosition;
 
-    List<AggregatePropertyValue> values = new ArrayList<>();
-    List<AggregateFile> files = new ArrayList<>();
+    List<AggregateUUPropertyValue> values = new ArrayList<>();
+    List<AggregateUUFile> files = new ArrayList<>();
 
 }

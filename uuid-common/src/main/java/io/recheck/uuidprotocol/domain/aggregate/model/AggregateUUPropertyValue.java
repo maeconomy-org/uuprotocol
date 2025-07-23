@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class AggregatePropertyValue extends AggregatedNode {
+public class AggregateUUPropertyValue extends AggregateNode {
 
     private String value;
     private String valueTypeCast;
     private String sourceType;
-    List<AggregateFile> files = new ArrayList<>();
+    List<AggregateUUFile> files = new ArrayList<>();
 
 }
