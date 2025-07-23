@@ -18,4 +18,6 @@ public class AggregateFindDTO {
 
     private Boolean hasHistory = false;
 
+    private String searchTerm;
+
 }
