@@ -1,6 +1,6 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence;
 
-import io.recheck.uuidprotocol.nodenetwork.aggregate.model.AggregateEntity;
+import io.recheck.uuidprotocol.domain.aggregate.model.AggregateEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;

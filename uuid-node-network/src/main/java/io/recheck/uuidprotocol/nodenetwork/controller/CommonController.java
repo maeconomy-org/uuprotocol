@@ -2,7 +2,6 @@ package io.recheck.uuidprotocol.nodenetwork.controller;
 
 
 import io.recheck.uuidprotocol.common.security.X509UserDetails;
-import io.recheck.uuidprotocol.nodenetwork.common.ClassResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api")
 public class CommonController {
-
-    private final ClassResolver classResolver;
 
     @GetMapping({"/cert"})
     public ResponseEntity<Object> getCert(@AuthenticationPrincipal X509UserDetails user) {

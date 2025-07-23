@@ -2,8 +2,6 @@ package io.recheck.uuidprotocol.common.firestore;
 
 import com.google.cloud.firestore.*;
 import io.recheck.uuidprotocol.common.firestore.model.FirestoreId;
-import io.recheck.uuidprotocol.common.firestore.querybuilder.QueryBuilder;
-import io.recheck.uuidprotocol.common.firestore.querybuilder.model.QueryCompositeFilter;
 import io.recheck.uuidprotocol.common.utils.ListUtils;
 import io.recheck.uuidprotocol.common.utils.ReflectionUtils;
 import lombok.Getter;
@@ -105,17 +103,14 @@ public class FirestoreDataSource<T_COLLECTION> {
 
 
 
-    public List<T_COLLECTION> where(QueryCompositeFilter queryCompositeFilter) {
-        return where(QueryBuilder.build(queryCompositeFilter), queryCompositeFilter.getOrderByFields());
-    }
 
     @SneakyThrows
-    public List<T_COLLECTION> where(Object pojo, Map<String, Query.Direction> orderByFields) {
+    public List<T_COLLECTION> where(Object filterCriteria, Map<String, Query.Direction> orderByFields) {
         List<Filter> filters = new ArrayList<>();
 
-        List<Field> allFields = ReflectionUtils.getAllFields(pojo.getClass());
+        List<Field> allFields = ReflectionUtils.getAllFields(filterCriteria.getClass());
         for (Field field : allFields) {
-            Object value = field.get(pojo);
+            Object value = field.get(filterCriteria);
             if (value != null) { //filter by all fields that has non empty value
                 if (value instanceof String) {
                     if (!StringUtils.hasText((CharSequence) value)) {

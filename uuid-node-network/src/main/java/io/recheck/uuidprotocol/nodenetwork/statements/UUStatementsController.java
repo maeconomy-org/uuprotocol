@@ -31,8 +31,8 @@ public class UUStatementsController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> find(@Valid UUStatementFindDTO uuStatementFindDTO) {
-        return ResponseEntity.ok(uuStatementsDataSource.where(uuStatementFindDTO));
+    public ResponseEntity<Object> findByDTOAndOrderByLastUpdatedAt(@Valid UUStatementFindDTO uuStatementFindDTO) {
+        return ResponseEntity.ok(uuStatementsDataSource.findByDTOAndOrderByLastUpdatedAt(uuStatementFindDTO));
     }
 
 }
