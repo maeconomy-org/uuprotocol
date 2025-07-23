@@ -32,6 +32,7 @@ public class AggregateRepository {
                 Criteria.where("uuid").is(uuid),
                 Criteria.where("parents").is(uuid),
                 Criteria.where("childs").is(uuid),
+                Criteria.where("address.uuid").is(uuid),
                 Criteria.where("files.uuid").is(uuid),
                 Criteria.where("properties.uuid").is(uuid),
                 Criteria.where("properties.files.uuid").is(uuid),
@@ -45,6 +46,18 @@ public class AggregateRepository {
 
     public Page<AggregateEntity> find(AggregateFindDTO aggregateFindDTO) {
         List<AggregationOperation> stages = new ArrayList<>();
+
+        if (StringUtils.hasText(aggregateFindDTO.getSearchTerm())) {
+            Document match = new Document("$match", new Document("$text", new Document("$search", aggregateFindDTO.getSearchTerm())));
+            stages.add(ctx -> match);
+
+            // Include score for sort
+            Document addScore = new Document("$addFields", new Document("score", new Document("$meta", "textScore")));
+            stages.add(ctx -> addScore);
+
+            // Sort by score DESC
+            stages.add(Aggregation.sort(Sort.by(Sort.Order.desc("score"))));
+        }
 
         if (Boolean.TRUE.equals(aggregateFindDTO.getHasChildrenFull())) {
             Document lookupChildrenStage = new Document("$lookup", new Document()
