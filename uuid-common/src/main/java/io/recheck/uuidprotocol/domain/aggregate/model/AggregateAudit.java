@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class AggregatedAudit {
+public class AggregateAudit {
 
     private Instant createdAt;
     private String createdBy;
