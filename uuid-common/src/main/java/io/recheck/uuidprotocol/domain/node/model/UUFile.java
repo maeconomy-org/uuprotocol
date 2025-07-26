@@ -10,5 +10,7 @@ public class UUFile extends Node {
     private String fileName;
     private String fileReference;
     private String label;
+    private String contentType;
+    private long size;
 
 }

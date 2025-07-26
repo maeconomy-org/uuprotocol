@@ -10,5 +10,7 @@ public class AggregateUUFile extends AggregateNode {
     private String fileName;
     private String fileReference;
     private String label;
+    private String contentType;
+    private long size;
 
 }

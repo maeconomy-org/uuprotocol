@@ -18,6 +18,10 @@ public class UUFileDTO extends NodeDTO<UUFile> {
 
     private String label;
 
+    private String contentType;
+
+    private long size;
+
     @Override
     public UUFile build() {
         UUFile uuFile = new UUFile();

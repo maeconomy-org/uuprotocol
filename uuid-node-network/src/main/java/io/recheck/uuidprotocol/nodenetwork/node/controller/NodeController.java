@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class NodeController<TNode extends Node, TNodeDTO extends NodeDTO<TNode>> {
 
-    private final NodeNetworkService<TNode, TNodeDTO> nodeNetworkService;
-    private final NodeDataSource<TNode> dataSource;
+    protected final NodeNetworkService<TNode, TNodeDTO> nodeNetworkService;
+    protected final NodeDataSource<TNode> dataSource;
 
     @PostMapping
     public ResponseEntity<Object> softDeleteAndCreate(@Valid @RequestBody TNodeDTO data, @AuthenticationPrincipal X509UserDetails user) {

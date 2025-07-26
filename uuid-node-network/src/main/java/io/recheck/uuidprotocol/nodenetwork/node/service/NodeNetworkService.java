@@ -14,9 +14,9 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNode>> {
 
-    private final NodeDataSource<TNode> dataSource;
-    private final AggregateNodeEventListener<TNode> aggregateNodeEventListener;
-    private final UUIDOwnerService uuidOwnerService;
+    protected final NodeDataSource<TNode> dataSource;
+    protected final AggregateNodeEventListener<TNode> aggregateNodeEventListener;
+    protected final UUIDOwnerService uuidOwnerService;
 
     public TNode softDeleteAndCreate(TNodeDTO dto, String certFingerprint) {
         validateAndUpdateType(dto, certFingerprint);
@@ -61,7 +61,7 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
         if (existingUUIDNode == null) {
             //create
             //validate if uuid is already used with another type of node
-            if (StringUtils.hasText(uuidOwner.getNodeType())) {
+            if (StringUtils.hasText(uuidOwner.getNodeType())) { //fix to match existingUUIDNode.nodeType==uuidOwner.nodeType
                 throw new ForbiddenException("The UUID has been already used by another type of node");
             }
             else {

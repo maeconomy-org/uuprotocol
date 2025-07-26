@@ -120,6 +120,8 @@ public class ImportService {
         uuFile.setFileReference(aggFile.getFileReference());
         uuFile.setFileName(aggFile.getFileName());
         uuFile.setLabel(aggFile.getLabel());
+        uuFile.setContentType(aggFile.getContentType());
+        uuFile.setSize(aggFile.getSize());
 
         uuFile = createAudit(uuFile, certFingerprint);
         setAggNode(aggFile, uuFile);
