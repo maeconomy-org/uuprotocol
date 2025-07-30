@@ -17,35 +17,36 @@ public class FirestoreDataSourceBatch {
     @Autowired
     protected Firestore firestore;
 
-    private WriteBatch writeBatch;
-    private int counter = 0;
-
     @SneakyThrows
-    public <T_COLLECTION> T_COLLECTION createOrUpdate(T_COLLECTION pojo) {
+    public <T_COLLECTION> T_COLLECTION createOrUpdate(T_COLLECTION pojo, FirestoreDataSourceBatchModel batchModel) {
         CollectionReference collectionReference = firestore.collection(pojo.getClass().getSimpleName());
         DocumentReference documentReference = collectionReference.document();
         setId(pojo, documentReference.getId());
-        if (writeBatch == null) {
-            writeBatch = firestore.batch();
+        if (batchModel.getWriteBatch() == null) {
+            batchModel.setWriteBatch(firestore.batch());
         }
-        writeBatch.set(documentReference, pojo);
-        if (counter < 200) {
-            counter++;
+        batchModel.getWriteBatch().set(documentReference, pojo);
+        if (batchModel.getCounter() < 400) {
+            batchModel.setCounter(batchModel.getCounter()+1);
         } else {
-            commitBatch();
+            commitBatch(batchModel);
         }
         return pojo;
     }
 
-    public void commitBatch() {
-        if (counter > 0) {
+    public WriteBatch getWriteBatch() {
+        return firestore.batch();
+    }
+
+    public void commitBatch(FirestoreDataSourceBatchModel batchModel) {
+        if (batchModel.getCounter() > 0) {
             try {
                 // Commit the batch and wait for the result
-                ApiFuture<List<WriteResult>> future = writeBatch.commit();
+                ApiFuture<List<WriteResult>> future = batchModel.getWriteBatch().commit();
                 List<WriteResult> results = future.get(); // Blocks until the batch completes
                 System.out.println("Batch committed successfully!");
-                writeBatch = firestore.batch();
-                counter = 0;
+                batchModel.setWriteBatch(firestore.batch());
+                batchModel.setCounter(0);
             } catch (InterruptedException | ExecutionException e) {
                 System.err.println("Error committing batch: " + e.getMessage());
                 e.printStackTrace();
