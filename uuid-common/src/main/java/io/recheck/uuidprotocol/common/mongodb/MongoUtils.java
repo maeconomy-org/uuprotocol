@@ -36,6 +36,13 @@ public class MongoUtils {
         return doc;
     }
 
+    /**
+     * properties >> properties.$[l0]
+     * properties.values >> properties.$[l0].values.$[l1]
+     * properties.values.files >> properties.$[l0].values.$[l1].files.$[l2]
+     * @param path
+     * @return
+     */
     static public String getArrayUpdatePath(String path) {
         if (!StringUtils.hasText(path)) {
             return "";
@@ -52,6 +59,15 @@ public class MongoUtils {
         return updatePath.toString();
     }
 
+    /**
+     * properties >> {"l0.uuid": "2ef89665-df1d"}
+     * properties.values >> {"l0.values.uuid": "2ef89665-df1d"}, {"l1.uuid": "2ef89665-df1d"}
+     * properties.values.files >> {"l0.values.files.uuid": "2ef89665-df1d"}, {"l1.files.uuid": "2ef89665-df1d"}, {"l2.uuid": "2ef89665-df1d"}
+     * @param path
+     * @param arrayIdField
+     * @param arrayIdValue
+     * @return
+     */
     static public List<Criteria> getArrayCriteriaList(String path, String arrayIdField, Object arrayIdValue) {
         List<Criteria> arrayFilterCriteria = new ArrayList<>();
         if (!StringUtils.hasText(path)) {

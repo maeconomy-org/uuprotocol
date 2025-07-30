@@ -1,15 +1,17 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener;
 
-import io.recheck.uuidprotocol.common.mongodb.query.UpdateArrayDoc;
-import io.recheck.uuidprotocol.common.mongodb.query.UpdateArrayValue;
 import io.recheck.uuidprotocol.domain.node.model.*;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateRepository;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.UUAddressCreate;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.UUNodeArrayDocCreate;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.UUNodeArrayUUIDAdd;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperation;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperationModelArray;
 import io.recheck.uuidprotocol.nodenetwork.audit.AuditEventListener;
 import io.recheck.uuidprotocol.nodenetwork.node.persistence.NodeDataSource;
 import io.recheck.uuidprotocol.nodenetwork.node.utils.ClassResolver;
 import io.recheck.uuidprotocol.nodenetwork.statements.UUStatementsClass;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
@@ -25,36 +27,37 @@ public class AggregateUUStatementsEventListener implements AuditEventListener<UU
     private final ClassResolver classResolver;
     private final AggregateRepository aggregateRepository;
 
-    static private MultiValueMap<UUStatementsClass, UpdateArrayValue> statementsUpdateArrayValueMap;
-    static private MultiValueMap<UUStatementsClass, UpdateArrayDoc> statementsUpdateArrayDocMap;
+    static private MultiValueMap<UUStatementsClass, AbstractOperation> statementsUpdateMap;
 
     static {
-        statementsUpdateArrayValueMap = new LinkedMultiValueMap<>();
-        statementsUpdateArrayValueMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_PARENT_OF, UUObject.class),
-                                                    List.of(new UpdateArrayValue("children")));
-        statementsUpdateArrayValueMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_CHILD_OF, UUObject.class),
-                                                    List.of(new UpdateArrayValue("parents")));
-        statementsUpdateArrayValueMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_INPUT_OF, UUObject.class),
-                                                    List.of(new UpdateArrayValue("outputs")));
-        statementsUpdateArrayValueMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_OUTPUT_OF, UUObject.class),
-                                                    List.of(new UpdateArrayValue("inputs")));
-        statementsUpdateArrayValueMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_MODEL_OF, UUObject.class),
-                                                    List.of(new UpdateArrayValue("instances")));
-        statementsUpdateArrayValueMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_INSTANCE_MODEL_OF, UUObject.class),
-                                                    List.of(new UpdateArrayValue("instances")));
+        statementsUpdateMap = new LinkedMultiValueMap<>();
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_PARENT_OF, UUObject.class),
+                                                    List.of(new UUNodeArrayUUIDAdd<>("children")));
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_CHILD_OF, UUObject.class),
+                                                    List.of(new UUNodeArrayUUIDAdd<>("parents")));
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_INPUT_OF, UUObject.class),
+                                                    List.of(new UUNodeArrayUUIDAdd<>("outputs")));
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_OUTPUT_OF, UUObject.class),
+                                                    List.of(new UUNodeArrayUUIDAdd<>("inputs")));
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_MODEL_OF, UUObject.class),
+                                                    List.of(new UUNodeArrayUUIDAdd<>("models")));
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.IS_INSTANCE_MODEL_OF, UUObject.class),
+                                                    List.of(new UUNodeArrayUUIDAdd<>("instances")));
 
 
-        statementsUpdateArrayDocMap = new LinkedMultiValueMap<>();
-        statementsUpdateArrayDocMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.HAS_PROPERTY, UUProperty.class),
-                List.of(new UpdateArrayDoc("properties", "uuid", "uuid")));
-        statementsUpdateArrayDocMap.put(new UUStatementsClass(UUProperty.class, UUStatementPredicate.HAS_VALUE, UUPropertyValue.class),
-                List.of(new UpdateArrayDoc("properties.values", "uuid", "uuid")));
-        statementsUpdateArrayDocMap.put(new UUStatementsClass(UUPropertyValue.class, UUStatementPredicate.HAS_FILE, UUFile.class),
-                List.of(new UpdateArrayDoc("properties.values.files", "uuid", "uuid")));
-        statementsUpdateArrayDocMap.put(new UUStatementsClass(UUProperty.class, UUStatementPredicate.HAS_FILE, UUFile.class),
-                List.of(new UpdateArrayDoc("properties.files", "uuid", "uuid")));
-        statementsUpdateArrayDocMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.HAS_FILE, UUFile.class),
-                List.of(new UpdateArrayDoc("files", "uuid", "uuid")));
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.HAS_PROPERTY, UUProperty.class),
+                List.of(new UUNodeArrayDocCreate<>("properties")));
+        statementsUpdateMap.put(new UUStatementsClass(UUProperty.class, UUStatementPredicate.HAS_VALUE, UUPropertyValue.class),
+                List.of(new UUNodeArrayDocCreate<>("properties.values")));
+        statementsUpdateMap.put(new UUStatementsClass(UUPropertyValue.class, UUStatementPredicate.HAS_FILE, UUFile.class),
+                List.of(new UUNodeArrayDocCreate<>("properties.values.files")));
+        statementsUpdateMap.put(new UUStatementsClass(UUProperty.class, UUStatementPredicate.HAS_FILE, UUFile.class),
+                List.of(new UUNodeArrayDocCreate<>("properties.files")));
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.HAS_FILE, UUFile.class),
+                List.of(new UUNodeArrayDocCreate<>("files")));
+
+        statementsUpdateMap.put(new UUStatementsClass(UUObject.class, UUStatementPredicate.HAS_ADDRESS, UUAddress.class),
+                List.of(new UUAddressCreate()));
     }
 
 
@@ -63,21 +66,24 @@ public class AggregateUUStatementsEventListener implements AuditEventListener<UU
         Node subjectNode = findNode(uuStatement.getSubject());
         Node objectNode = findNode(uuStatement.getObject());
 
-        List<UpdateArrayValue> updateArrayValueList = statementsUpdateArrayValueMap.get(new UUStatementsClass(subjectNode.getClass(), uuStatement.getPredicate(), objectNode.getClass()));
+        List<AbstractOperation> updateArrayValueList = statementsUpdateMap.get(new UUStatementsClass(subjectNode.getClass(), uuStatement.getPredicate(), objectNode.getClass()));
         if (updateArrayValueList != null) {
-            for (UpdateArrayValue updateArrayValue : updateArrayValueList) {
-                Query query = new Query(Criteria.where(updateArrayValue.getParentPath() + ".uuid").is(subjectNode.getUuid()));
-                Update update = updateArrayValue.pushArrayValue(objectNode.getUuid());
-                aggregateRepository.update(query, update);
-            }
-        }
+            for (AbstractOperation operation : updateArrayValueList) {
+                if (operation instanceof UUAddressCreate || operation instanceof UUNodeArrayUUIDAdd) {
+                    Query query = operation.getQuery(subjectNode);
+                    Update update = operation.getUpdate(objectNode);
+                    aggregateRepository.update(query, update);
+                }
+                else if (operation instanceof UUNodeArrayDocCreate) {
+                    Query query = operation.getQuery(subjectNode);
+                    Update update = operation.getUpdate(new AbstractOperationModelArray<>(objectNode, subjectNode));
+                    aggregateRepository.update(query, update);
+                }
+                else {
+                    throw new UnsupportedOperationException("AggregateUUStatementsEventListener#postCreate");
+                }
 
-        List<UpdateArrayDoc> updateArrayDocList = statementsUpdateArrayDocMap.get(new UUStatementsClass(subjectNode.getClass(), uuStatement.getPredicate(), objectNode.getClass()));
-        if (updateArrayDocList != null) {
-            for (UpdateArrayDoc updateArrayDoc : updateArrayDocList) {
-                Query query = new Query(Criteria.where(updateArrayDoc.getParentPath() + ".uuid").is(subjectNode.getUuid()));
-                Update update = updateArrayDoc.pushArrayDoc(subjectNode.getUuid(), objectNode);
-                aggregateRepository.update(query, update);
+
             }
         }
 

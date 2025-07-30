@@ -1,0 +1,24 @@
+package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation;
+
+import io.recheck.uuidprotocol.common.mongodb.MongoUtils;
+import io.recheck.uuidprotocol.domain.node.model.UUAddress;
+import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+
+public class UUAddressUpdate extends AbstractOperation<UUAddress, UUAddress> {
+
+    @Override
+    public Query getQuery(UUAddress uuAddress) {
+        return new Query(Criteria.where("address.uuid").is(uuAddress.getUuid()));
+    }
+
+    @Override
+    public Update getUpdate(UUAddress updateObject) {
+        Update update = new Update();
+        update.set("address", MongoUtils.convertToDocument(updateObject));
+        return update;
+    }
+
+}
