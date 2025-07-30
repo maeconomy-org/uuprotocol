@@ -1,6 +1,7 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate.imports;
 
 import io.recheck.uuidprotocol.common.firestore.FirestoreDataSourceBatch;
+import io.recheck.uuidprotocol.common.firestore.FirestoreDataSourceBatchModel;
 import io.recheck.uuidprotocol.domain.aggregate.model.*;
 import io.recheck.uuidprotocol.domain.node.model.*;
 import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
@@ -24,36 +25,38 @@ public class ImportService {
     private final AggregateRepository aggregateRepository;
 
     public void saveAll(List<AggregateEntity> aggregateEntityList, String certFingerprint) {
+        FirestoreDataSourceBatchModel batchModel = new FirestoreDataSourceBatchModel();
+        
         for (AggregateEntity aggObject : aggregateEntityList) {
-            UUObject uuObject = saveUUObject(aggObject, certFingerprint);
+            UUObject uuObject = saveUUObject(aggObject, certFingerprint, batchModel);
 
             if (aggObject.getAddress() != null) {
-                saveUUAddress(aggObject.getAddress(), uuObject.getUuid(), certFingerprint);
+                saveUUAddress(aggObject.getAddress(), uuObject.getUuid(), certFingerprint, batchModel);
             }
 
             if (aggObject.getFiles() != null) {
                 for (AggregateUUFile aggFile : aggObject.getFiles()) {
-                    saveUUFile(aggFile, uuObject.getUuid(), certFingerprint);
+                    saveUUFile(aggFile, uuObject.getUuid(), certFingerprint, batchModel);
                 }
             }
 
             if (aggObject.getProperties() != null) {
                 for (AggregateUUProperty aggProperty : aggObject.getProperties()) {
-                    UUProperty uuProperty = saveUUProperty(aggProperty, uuObject.getUuid(), certFingerprint);
+                    UUProperty uuProperty = saveUUProperty(aggProperty, uuObject.getUuid(), certFingerprint, batchModel);
 
                     if (aggProperty.getFiles() != null) {
                         for (AggregateUUFile aggPropertyFile : aggProperty.getFiles()) {
-                            saveUUFile(aggPropertyFile, uuProperty.getUuid(), certFingerprint);
+                            saveUUFile(aggPropertyFile, uuProperty.getUuid(), certFingerprint, batchModel);
                         }
                     }
 
                     if (aggProperty.getValues() != null) {
                         for (AggregateUUPropertyValue aggPropertyValue : aggProperty.getValues()) {
-                            UUPropertyValue uuPropertyValue = saveUUPropertyValue(aggPropertyValue, uuProperty.getUuid(), certFingerprint);
+                            UUPropertyValue uuPropertyValue = saveUUPropertyValue(aggPropertyValue, uuProperty.getUuid(), certFingerprint, batchModel);
 
                             if (aggPropertyValue.getFiles() != null) {
                                 for (AggregateUUFile aggPropertyValueFile : aggPropertyValue.getFiles()) {
-                                    saveUUFile(aggPropertyValueFile, uuPropertyValue.getUuid(), certFingerprint);
+                                    saveUUFile(aggPropertyValueFile, uuPropertyValue.getUuid(), certFingerprint, batchModel);
                                 }
                             }
                         }
@@ -63,7 +66,7 @@ public class ImportService {
             }
         }
 
-        firestoreDataSourceBatch.commitBatch();
+        firestoreDataSourceBatch.commitBatch(batchModel);
         aggregateRepository.saveAll(aggregateEntityList);
     }
 
@@ -75,9 +78,9 @@ public class ImportService {
         aggNode.setLastUpdatedBy(uuNode.getLastUpdatedBy());
     }
 
-    private UUAddress saveUUAddress(AggregateUUAddress aggAddress, String uuObjectUUID, String certFingerprint) {
+    private UUAddress saveUUAddress(AggregateUUAddress aggAddress, String uuObjectUUID, String certFingerprint, FirestoreDataSourceBatchModel batchModel) {
         UUAddress uuAddress = new UUAddress();
-        uuAddress.setUuid(createUUID(certFingerprint, UUAddress.class.getSimpleName()).getUuid());
+        uuAddress.setUuid(createUUID(certFingerprint, UUAddress.class.getSimpleName(), batchModel).getUuid());
         uuAddress.setFullAddress(aggAddress.getFullAddress());
         uuAddress.setStreet(aggAddress.getStreet());
         uuAddress.setHouseNumber(aggAddress.getHouseNumber());
@@ -87,7 +90,7 @@ public class ImportService {
         uuAddress.setState(aggAddress.getState());
         uuAddress.setDistrict(aggAddress.getDistrict());
 
-        uuAddress = createAudit(uuAddress, certFingerprint);
+        uuAddress = createAudit(uuAddress, certFingerprint, batchModel);
         setAggNode(aggAddress, uuAddress);
 
         UUStatements uuStatement = new UUStatements();
@@ -95,35 +98,35 @@ public class ImportService {
         uuStatement.setPredicate(UUStatementPredicate.HAS_ADDRESS);
         uuStatement.setObject(uuAddress.getUuid());
 
-        createAudit(uuStatement, certFingerprint);
-        createAudit(buildOpposite(uuStatement), certFingerprint);
+        createAudit(uuStatement, certFingerprint, batchModel);
+        createAudit(buildOpposite(uuStatement), certFingerprint, batchModel);
 
         return uuAddress;
     }
 
-    private UUObject saveUUObject(AggregateEntity aggObject, String certFingerprint) {
+    private UUObject saveUUObject(AggregateEntity aggObject, String certFingerprint, FirestoreDataSourceBatchModel batchModel) {
         UUObject uuObject = new UUObject();
-        uuObject.setUuid(createUUID(certFingerprint, UUObject.class.getSimpleName()).getUuid());
+        uuObject.setUuid(createUUID(certFingerprint, UUObject.class.getSimpleName(), batchModel).getUuid());
         uuObject.setName(aggObject.getName());
         uuObject.setAbbreviation(aggObject.getAbbreviation());
         uuObject.setVersion(aggObject.getVersion());
         uuObject.setDescription(aggObject.getDescription());
 
-        uuObject = createAudit(uuObject, certFingerprint);
+        uuObject = createAudit(uuObject, certFingerprint, batchModel);
         setAggNode(aggObject, uuObject);
         return uuObject;
     }
 
-    private UUFile saveUUFile(AggregateUUFile aggFile, String nodeUUID, String certFingerprint) {
+    private UUFile saveUUFile(AggregateUUFile aggFile, String nodeUUID, String certFingerprint, FirestoreDataSourceBatchModel batchModel) {
         UUFile uuFile = new UUFile();
-        uuFile.setUuid(createUUID(certFingerprint, UUFile.class.getSimpleName()).getUuid());
+        uuFile.setUuid(createUUID(certFingerprint, UUFile.class.getSimpleName(), batchModel).getUuid());
         uuFile.setFileReference(aggFile.getFileReference());
         uuFile.setFileName(aggFile.getFileName());
         uuFile.setLabel(aggFile.getLabel());
         uuFile.setContentType(aggFile.getContentType());
         uuFile.setSize(aggFile.getSize());
 
-        uuFile = createAudit(uuFile, certFingerprint);
+        uuFile = createAudit(uuFile, certFingerprint, batchModel);
         setAggNode(aggFile, uuFile);
 
         UUStatements uuStatement = new UUStatements();
@@ -131,15 +134,15 @@ public class ImportService {
         uuStatement.setPredicate(UUStatementPredicate.HAS_FILE);
         uuStatement.setObject(uuFile.getUuid());
 
-        createAudit(uuStatement, certFingerprint);
-        createAudit(buildOpposite(uuStatement), certFingerprint);
+        createAudit(uuStatement, certFingerprint, batchModel);
+        createAudit(buildOpposite(uuStatement), certFingerprint, batchModel);
 
         return uuFile;
     }
 
-    private UUProperty saveUUProperty(AggregateUUProperty aggProperty, String uuObjectUUID, String certFingerprint) {
+    private UUProperty saveUUProperty(AggregateUUProperty aggProperty, String uuObjectUUID, String certFingerprint, FirestoreDataSourceBatchModel batchModel) {
         UUProperty uuProperty = new UUProperty();
-        uuProperty.setUuid(createUUID(certFingerprint, UUProperty.class.getSimpleName()).getUuid());
+        uuProperty.setUuid(createUUID(certFingerprint, UUProperty.class.getSimpleName(), batchModel).getUuid());
         uuProperty.setKey(aggProperty.getKey());
         uuProperty.setVersion(aggProperty.getVersion());
         uuProperty.setLabel(aggProperty.getLabel());
@@ -151,7 +154,7 @@ public class ImportService {
         uuProperty.setProcessingOrderPosition(aggProperty.getProcessingOrderPosition());
         uuProperty.setViewOrderPosition(aggProperty.getViewOrderPosition());
 
-        uuProperty = createAudit(uuProperty, certFingerprint);
+        uuProperty = createAudit(uuProperty, certFingerprint, batchModel);
         setAggNode(aggProperty, uuProperty);
 
         UUStatements uuPropertyStatement = new UUStatements();
@@ -159,20 +162,20 @@ public class ImportService {
         uuPropertyStatement.setPredicate(UUStatementPredicate.HAS_PROPERTY);
         uuPropertyStatement.setObject(uuProperty.getUuid());
 
-        createAudit(uuPropertyStatement, certFingerprint);
-        createAudit(buildOpposite(uuPropertyStatement), certFingerprint);
+        createAudit(uuPropertyStatement, certFingerprint, batchModel);
+        createAudit(buildOpposite(uuPropertyStatement), certFingerprint, batchModel);
 
         return uuProperty;
     }
 
-    private UUPropertyValue saveUUPropertyValue(AggregateUUPropertyValue aggPropertyValue, String uuPropertyUUID, String certFingerprint) {
+    private UUPropertyValue saveUUPropertyValue(AggregateUUPropertyValue aggPropertyValue, String uuPropertyUUID, String certFingerprint, FirestoreDataSourceBatchModel batchModel) {
         UUPropertyValue uuPropertyValue = new UUPropertyValue();
-        uuPropertyValue.setUuid(createUUID(certFingerprint, UUPropertyValue.class.getSimpleName()).getUuid());
+        uuPropertyValue.setUuid(createUUID(certFingerprint, UUPropertyValue.class.getSimpleName(), batchModel).getUuid());
         uuPropertyValue.setValue(aggPropertyValue.getValue());
         uuPropertyValue.setValueTypeCast(aggPropertyValue.getValueTypeCast());
         uuPropertyValue.setSourceType(aggPropertyValue.getSourceType());
 
-        uuPropertyValue = createAudit(uuPropertyValue, certFingerprint);
+        uuPropertyValue = createAudit(uuPropertyValue, certFingerprint, batchModel);
         setAggNode(aggPropertyValue, uuPropertyValue);
 
         UUStatements uuStatement = new UUStatements();
@@ -180,8 +183,8 @@ public class ImportService {
         uuStatement.setPredicate(UUStatementPredicate.HAS_VALUE);
         uuStatement.setObject(uuPropertyValue.getUuid());
 
-        createAudit(uuStatement, certFingerprint);
-        createAudit(buildOpposite(uuStatement), certFingerprint);
+        createAudit(uuStatement, certFingerprint, batchModel);
+        createAudit(buildOpposite(uuStatement), certFingerprint, batchModel);
 
         return uuPropertyValue;
     }
@@ -195,20 +198,20 @@ public class ImportService {
     }
 
 
-    private <T extends Audit> T createAudit(T pojoAudit, String certFingerprint) {
+    private <T extends Audit> T createAudit(T pojoAudit, String certFingerprint, FirestoreDataSourceBatchModel batchModel) {
         Instant now = Instant.now();
         pojoAudit.setCreatedAt(now);
         pojoAudit.setCreatedBy(certFingerprint);
         pojoAudit.setLastUpdatedAt(now);
         pojoAudit.setLastUpdatedBy(certFingerprint);
-        return firestoreDataSourceBatch.createOrUpdate(pojoAudit);
+        return firestoreDataSourceBatch.createOrUpdate(pojoAudit, batchModel);
     }
 
-    private UUIDOwner createUUID(String certFingerprint, String nodeType) {
+    private UUIDOwner createUUID(String certFingerprint, String nodeType, FirestoreDataSourceBatchModel batchModel) {
         String uuid = UUID.randomUUID().toString();
         UUIDOwner uuidOwner = new UUIDOwner(uuid, certFingerprint);
         uuidOwner.setNodeType(nodeType);
-        return firestoreDataSourceBatch.createOrUpdate(uuidOwner);
+        return firestoreDataSourceBatch.createOrUpdate(uuidOwner, batchModel);
     }
 
 }
