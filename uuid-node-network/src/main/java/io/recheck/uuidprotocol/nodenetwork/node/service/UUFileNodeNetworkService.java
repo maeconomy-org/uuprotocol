@@ -25,13 +25,16 @@ import java.nio.file.StandardCopyOption;
 public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileDTO>{
 
     private final Path storageDir;
+    private final String serverAddress;
 
     @SneakyThrows
     public UUFileNodeNetworkService(@Value("${UUFileNodeNetworkService.storageDirProperty}") String storageDirProperty,
+                                    @Value("${UUFileNodeNetworkService.serverAddressProperty}") String serverAddressProperty,
                                     UUFileDataSource uuFileDataSource,
                                     AggregateUUFileEventListener aggregateUUFileEventListener,
                                     UUIDOwnerService uuidOwnerService) {
         super(uuFileDataSource, aggregateUUFileEventListener, uuidOwnerService);
+        serverAddress = serverAddressProperty;
         storageDir = Paths.get(storageDirProperty);
         if (! new UrlResource(storageDir.toUri()).exists()) {
             Files.createDirectory(storageDir);
@@ -40,28 +43,8 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
 
     @SneakyThrows
     public UUFile storeOrReplaceFile(String uuid, MultipartFile file, X509UserDetails user) {
-
         if (file.getSize() > 100 * 1024 * 1024) {
             throw new IllegalArgumentException("File too large (max 100MB)");
-        }
-
-        Path fileDirectory = storageDir.resolve(uuid);
-        Path fileReference = fileDirectory.resolve(file.getOriginalFilename());
-
-        // Handle replacement && history??
-        UUFile existing = dataSource.findLast(uuid);
-        if (existing != null) {
-            //build filereference of old name , not from new
-            Files.deleteIfExists(Path.of(existing.getFileReference()));
-//            subtractUsage(user.getCertFingerprint(), existing.getSize());
-            /*
-            // delete file & subtractUsage ? or NOT delete file & NOT subtractUsage ?
-            if (!existing.getSoftDeleted()) {
-
-            }
-            else {
-            }
-            */
         }
 
         UUFileDTO uuFileDTO = new UUFileDTO();
@@ -69,32 +52,37 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
         uuFileDTO.setFileName(file.getOriginalFilename());
         uuFileDTO.setContentType(file.getContentType());
         uuFileDTO.setSize(file.getSize());
-        // fileReference : "filestorage\<uuid>\<filename>" ??
-        // fileReference : "https://<server>/download/{uuid}" ??
-        uuFileDTO.setFileReference(fileReference.toString());
+        uuFileDTO.setFileReference(String.format("%s/api/UUFile/download/%s", serverAddress, uuid));
 
         UUFile uuFile = softDeleteAndCreate(uuFileDTO, user.getCertFingerprint());
 
-
-
         // Save new file
-        if (! new UrlResource(fileDirectory.toUri()).exists()) {
-            Files.createDirectory(fileDirectory);
+        Path fileUUIDDirectory = storageDir.resolve(uuid);
+        if (! new UrlResource(fileUUIDDirectory.toUri()).exists()) {
+            Files.createDirectory(fileUUIDDirectory);
         }
+
+        Path fileCreatedAtDirectory = fileUUIDDirectory.resolve(String.valueOf(uuFile.getCreatedAt().getEpochSecond()));
+        Files.createDirectory(fileCreatedAtDirectory);
+        Path fileReference = fileCreatedAtDirectory.resolve(file.getOriginalFilename());
+
         Files.copy(file.getInputStream(), fileReference, StandardCopyOption.REPLACE_EXISTING);
-//        addUsage(user.getCertFingerprint(), file.getSize());
 
         return uuFile;
     }
 
 
     @SneakyThrows
-    public ResponseEntity<Resource> downloadFile(String uuid) {
+    public ResponseEntity<Resource> downloadFile(X509UserDetails user, String uuid) {
+        uuidOwnerService.validateOwnerUUID(user.getCertFingerprint(), uuid);
         UUFile last = dataSource.findLast(uuid);
         if (last == null) {
             return ResponseEntity.notFound().build();
         }
-        Resource file = new UrlResource(Path.of(last.getFileReference()).toUri());
+        Path fileUUIDDirectory = storageDir.resolve(uuid);
+        Path fileCreatedAtDirectory = fileUUIDDirectory.resolve(String.valueOf(last.getCreatedAt().getEpochSecond()));
+        Path fileReference = fileCreatedAtDirectory.resolve(last.getFileName());
+        Resource file = new UrlResource(Path.of(fileReference.toString()).toUri());
         if (!file.exists()) {
             return ResponseEntity.notFound().build();
         }
