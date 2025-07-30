@@ -30,10 +30,11 @@ public class UUFileController extends NodeController<UUFile, UUFileDTO> {
     }
 
     @GetMapping("/download/{uuid}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable
+    public ResponseEntity<Resource> downloadFile(@AuthenticationPrincipal X509UserDetails user,
+                                                    @PathVariable
                                                      @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
                                                              String uuid) {
-        return ((UUFileNodeNetworkService) nodeNetworkService).downloadFile(uuid);
+        return ((UUFileNodeNetworkService) nodeNetworkService).downloadFile(user, uuid);
     }
 
 }
