@@ -59,6 +59,17 @@ public class AggregateRepository {
             stages.add(Aggregation.sort(Sort.by(Sort.Order.desc("score"))));
         }
 
+        if (aggregateFindDTO.getHasParentUUIDFilter()==true) {
+            if (StringUtils.hasText(aggregateFindDTO.getParentUUID())) {
+                stages.add(Aggregation.match(Criteria.where("parents").is(aggregateFindDTO.getParentUUID())));
+            }
+            else {
+                stages.add(context -> new Document("$addFields", new Document("parentsCount", new Document("$size", "$parents"))));
+                stages.add(context -> new Document("$match", new Document("parentsCount", 0)));
+            }
+        }
+
+
         if (Boolean.TRUE.equals(aggregateFindDTO.getHasChildrenFull())) {
             Document lookupChildrenStage = new Document("$lookup", new Document()
                     .append("from", "AggregateEntity")
