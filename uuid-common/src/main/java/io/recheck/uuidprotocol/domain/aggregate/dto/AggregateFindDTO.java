@@ -18,6 +18,9 @@ public class AggregateFindDTO {
 
     private Boolean hasHistory = false;
 
+    private Boolean hasParentUUIDFilter = false;
+    private String parentUUID;
+
     private String searchTerm;
 
 }
