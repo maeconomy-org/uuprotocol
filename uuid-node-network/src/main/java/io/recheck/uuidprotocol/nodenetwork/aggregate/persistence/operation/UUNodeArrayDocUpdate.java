@@ -3,7 +3,7 @@ package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation;
 import io.recheck.uuidprotocol.common.mongodb.MongoUtils;
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperation;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import java.util.List;
 import java.util.Map;
 
-@Data
+@RequiredArgsConstructor
 public class UUNodeArrayDocUpdate<T_Object extends Node> extends AbstractOperation<T_Object, T_Object> {
 
     private final String arrayDocFullPath;
