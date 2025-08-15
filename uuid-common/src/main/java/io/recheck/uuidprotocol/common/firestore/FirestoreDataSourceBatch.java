@@ -5,12 +5,14 @@ import com.google.cloud.firestore.*;
 import io.recheck.uuidprotocol.common.firestore.model.FirestoreId;
 import io.recheck.uuidprotocol.common.utils.ReflectionUtils;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 @Service
 public class FirestoreDataSourceBatch {
 
@@ -41,14 +43,14 @@ public class FirestoreDataSourceBatch {
     public void commitBatch(FirestoreDataSourceBatchModel batchModel) {
         if (batchModel.getCounter() > 0) {
             try {
-                // Commit the batch and wait for the result
+                log.info("commit batch with {} count of objects", batchModel.getCounter());
                 ApiFuture<List<WriteResult>> future = batchModel.getWriteBatch().commit();
-                List<WriteResult> results = future.get(); // Blocks until the batch completes
-                System.out.println("Batch committed successfully!");
+                future.get(); // Blocks until the batch completes
+                log.info("Batch committed successfully!");
                 batchModel.setWriteBatch(firestore.batch());
                 batchModel.setCounter(0);
             } catch (InterruptedException | ExecutionException e) {
-                System.err.println("Error committing batch: " + e.getMessage());
+                log.info("Error committing batch: " + e.getMessage());
                 e.printStackTrace();
             }
         }
