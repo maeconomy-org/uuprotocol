@@ -2,12 +2,12 @@ package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation;
 
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperation;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-@Data
+@RequiredArgsConstructor
 public class UUNodeArrayUUIDAdd<T_Query extends Node, T_Object extends Node> extends AbstractOperation<T_Query, T_Object> {
 
     private final String arrayDocFullPath;

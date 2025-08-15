@@ -4,7 +4,7 @@ import io.recheck.uuidprotocol.common.mongodb.MongoUtils;
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperation;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperationModelArray;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-@Data
+@RequiredArgsConstructor
 public class UUNodeArrayDocCreate<T_Query extends Node,
                                     T_UpdateModel extends AbstractOperationModelArray<T_Object, T_Criteria>,
                                     T_Object extends Node,
