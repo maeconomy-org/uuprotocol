@@ -48,7 +48,7 @@ public class X509ClientsSecurityConfiguration {
         configuration.addAllowedOriginPattern("*");
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization", "Content-Type", "Accept", "Origin",
+                "Authorization", "Content-Type", "Accept", "Origin", "CreatedBy",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers"
                 ));
         configuration.setAllowCredentials(true);
