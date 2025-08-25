@@ -1,9 +1,10 @@
 package io.recheck.uuidprotocol.common.firestore;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
-import io.recheck.uuidprotocol.common.firestore.model.FirestoreId;
-import io.recheck.uuidprotocol.common.utils.ReflectionUtils;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.WriteResult;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,9 @@ public class FirestoreDataSourceBatch {
     protected Firestore firestore;
 
     @SneakyThrows
-    public <T_COLLECTION> T_COLLECTION createOrUpdate(T_COLLECTION pojo, FirestoreDataSourceBatchModel batchModel) {
+    public <T_COLLECTION> T_COLLECTION create(T_COLLECTION pojo, FirestoreDataSourceBatchModel batchModel) {
         CollectionReference collectionReference = firestore.collection(pojo.getClass().getSimpleName());
         DocumentReference documentReference = collectionReference.document();
-        setId(pojo, documentReference.getId());
         if (batchModel.getWriteBatch() == null) {
             batchModel.setWriteBatch(firestore.batch());
         }
@@ -34,10 +34,6 @@ public class FirestoreDataSourceBatch {
             commitBatch(batchModel);
         }
         return pojo;
-    }
-
-    public WriteBatch getWriteBatch() {
-        return firestore.batch();
     }
 
     public void commitBatch(FirestoreDataSourceBatchModel batchModel) {
@@ -54,11 +50,6 @@ public class FirestoreDataSourceBatch {
                 e.printStackTrace();
             }
         }
-    }
-
-    @SneakyThrows
-    private void setId(Object object, String id) {
-        ReflectionUtils.setValueAnnotationPresent(FirestoreId.class, object, id);
     }
 
 

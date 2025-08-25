@@ -3,14 +3,18 @@ package io.recheck.uuidprotocol.nodenetwork.statements;
 import io.recheck.uuidprotocol.common.exceptions.NodeTypeException;
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
 import io.recheck.uuidprotocol.common.exceptions.PossibleStatementsException;
-import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
-import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
-import io.recheck.uuidprotocol.domain.node.model.UUStatements;
+import io.recheck.uuidprotocol.domain.node.model.*;
 import io.recheck.uuidprotocol.domain.owner.model.UUIDOwner;
+import io.recheck.uuidprotocol.domain.statements.dto.UUStatementDTO;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatementPredicate;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatements;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatementsClassType;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener.AggregateUUStatementsEventListener;
 import io.recheck.uuidprotocol.nodenetwork.owner.UUIDOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,10 +35,10 @@ public class UUStatementsService {
         List<UUStatements> uuStatementsList = new ArrayList<>();
         for (UUStatementDTO uuStatementDTO : uuStatementsSet) {
             //exclude validation of owning uuids - everyone could make statements
-//            validateOwnerUUID(uuStatementDTO, certFingerprint);
+            //validateOwnerUUID(uuStatementDTO, certFingerprint);
             validateStatement(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate(), uuStatementDTO.getObject());
             uuStatementsList.add(findOrCreate(uuStatementDTO.build(), certFingerprint));
-            uuStatementsList.add(findOrCreate(buildOpposite(uuStatementDTO).build(), certFingerprint));
+            uuStatementsList.add(findOrCreate(uuStatementDTO.buildOpposite(), certFingerprint));
         }
 
         return uuStatementsList;
@@ -42,17 +46,13 @@ public class UUStatementsService {
 
     public List<UUStatements> softDeleteWithOpposite(UUStatementDTO uuStatementDTO, String certFingerprint) {
         //exclude validation of owning uuids - everyone could soft delete statements
-//        validateOwnerUUID(uuStatementDTO, certFingerprint);
+        //validateOwnerUUID(uuStatementDTO, certFingerprint);
 
         List<UUStatements> uuStatementsList = new ArrayList<>();
         uuStatementsList.add(softDelete(uuStatementDTO.build(), certFingerprint));
-        uuStatementsList.add(softDelete(buildOpposite(uuStatementDTO).build(), certFingerprint));
+        uuStatementsList.add(softDelete(uuStatementDTO.buildOpposite(), certFingerprint));
 
         return uuStatementsList;
-    }
-
-    private UUStatementDTO buildOpposite(UUStatementDTO uuStatementDTO) {
-        return new UUStatementDTO(uuStatementDTO.getObject(), uuStatementDTO.getPredicate().getOpposite(uuStatementDTO.getPredicate()), uuStatementDTO.getSubject());
     }
 
     private UUStatements findOrCreate(UUStatements uuStatements, String certFingerprint) {
@@ -73,6 +73,41 @@ public class UUStatementsService {
             lastUpdated = uuStatementsDataSource.softDeleteAudit(lastUpdated, certFingerprint);
         }
         return lastUpdated;
+    }
+
+
+
+
+
+    static private MultiValueMap<UUStatementPredicate, UUStatementsClassType> uuStatementValidationTypeMap;
+
+    static {
+        uuStatementValidationTypeMap = new LinkedMultiValueMap<>();
+
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_PARENT_OF, new UUStatementsClassType(UUObject.class, UUStatementPredicate.IS_PARENT_OF, UUObject.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_CHILD_OF, new UUStatementsClassType(UUObject.class, UUStatementPredicate.IS_CHILD_OF, UUObject.class));
+
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_INPUT_OF, new UUStatementsClassType(UUObject.class, UUStatementPredicate.IS_INPUT_OF, UUObject.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_OUTPUT_OF, new UUStatementsClassType(UUObject.class, UUStatementPredicate.IS_OUTPUT_OF, UUObject.class));
+
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_MODEL_OF, new UUStatementsClassType(UUObject.class, UUStatementPredicate.IS_MODEL_OF, UUObject.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_INSTANCE_MODEL_OF, new UUStatementsClassType(UUObject.class, UUStatementPredicate.IS_INSTANCE_MODEL_OF, UUObject.class));
+
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_PROPERTY_OF, new UUStatementsClassType(UUProperty.class, UUStatementPredicate.IS_PROPERTY_OF, UUObject.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.HAS_PROPERTY, new UUStatementsClassType(UUObject.class, UUStatementPredicate.HAS_PROPERTY, UUProperty.class));
+
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_VALUE_OF, new UUStatementsClassType(UUPropertyValue.class, UUStatementPredicate.IS_VALUE_OF, UUProperty.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.HAS_VALUE, new UUStatementsClassType(UUProperty.class, UUStatementPredicate.HAS_VALUE, UUPropertyValue.class));
+
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_FILE_OF, new UUStatementsClassType(UUFile.class, UUStatementPredicate.IS_FILE_OF, UUPropertyValue.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_FILE_OF, new UUStatementsClassType(UUFile.class, UUStatementPredicate.IS_FILE_OF, UUProperty.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_FILE_OF, new UUStatementsClassType(UUFile.class, UUStatementPredicate.IS_FILE_OF, UUObject.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.HAS_FILE, new UUStatementsClassType(UUPropertyValue.class, UUStatementPredicate.HAS_FILE, UUFile.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.HAS_FILE, new UUStatementsClassType(UUProperty.class, UUStatementPredicate.HAS_FILE, UUFile.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.HAS_FILE, new UUStatementsClassType(UUObject.class, UUStatementPredicate.HAS_FILE, UUFile.class));
+
+        uuStatementValidationTypeMap.add(UUStatementPredicate.HAS_ADDRESS, new UUStatementsClassType(UUObject.class, UUStatementPredicate.HAS_ADDRESS, UUAddress.class));
+        uuStatementValidationTypeMap.add(UUStatementPredicate.IS_ADDRESS_OF, new UUStatementsClassType(UUAddress.class, UUStatementPredicate.IS_ADDRESS_OF, UUObject.class));
     }
 
     private void validateStatement(String subject, UUStatementPredicate predicate, String object) {
@@ -96,8 +131,8 @@ public class UUStatementsService {
             throw new NodeTypeException("object type not defined");
         }
 
-        List<UUStatementsClass> uuStatementsPossibleList1 = UUStatementsClassPredicateMap.get(predicate);
-        for (UUStatementsClass uuStatementsPossible : uuStatementsPossibleList1) {
+        List<UUStatementsClassType> uuStatementsPossibleList = uuStatementValidationTypeMap.get(predicate);
+        for (UUStatementsClassType uuStatementsPossible : uuStatementsPossibleList) {
             if (subjectUUID.getNodeType().equals(uuStatementsPossible.getSubjectClass().getSimpleName()) &&
                     objectUUID.getNodeType().equals(uuStatementsPossible.getObjectClass().getSimpleName())) {
                 return;
@@ -105,7 +140,7 @@ public class UUStatementsService {
         }
 
         throw new PossibleStatementsException(
-                "The possible statements for predicate: " + predicate + " are between: " + uuStatementsPossibleList1 + ".\n" +
+                "The possible statements for predicate: " + predicate + " are between: " + uuStatementsPossibleList + ".\n" +
                         "Your statement is : {" +
                         "subjectType=" + subjectUUID.getNodeType() +
                         ", predicate=" + predicate +

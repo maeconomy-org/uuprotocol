@@ -2,7 +2,7 @@ package io.recheck.uuidprotocol.nodenetwork.statements;
 
 import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Query;
-import io.recheck.uuidprotocol.domain.node.model.UUStatements;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatements;
 import io.recheck.uuidprotocol.nodenetwork.audit.AuditDataSource;
 import org.springframework.stereotype.Service;
 

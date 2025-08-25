@@ -1,8 +1,6 @@
 package io.recheck.uuidprotocol.common.firestore;
 
 import com.google.cloud.firestore.*;
-import io.recheck.uuidprotocol.common.firestore.model.FirestoreId;
-import io.recheck.uuidprotocol.common.utils.ListUtils;
 import io.recheck.uuidprotocol.common.utils.ReflectionUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,79 +28,22 @@ public class FirestoreDataSource<T_COLLECTION> {
     }
 
     @SneakyThrows
-    public T_COLLECTION createOrUpdate(T_COLLECTION pojo) {
+    public T_COLLECTION create(T_COLLECTION pojo) {
         CollectionReference collectionReference = getCollection();
-        DocumentReference documentReference;
-        String documentId = getId(pojo);
-        if (StringUtils.hasText(documentId)) {
-            documentReference = collectionReference.document(documentId);
-        }
-        else {
-            documentReference = collectionReference.document();
-            setId(pojo, documentReference.getId());
-        }
-        documentReference.set(pojo).get();
+        collectionReference.document().set(pojo).get();
         return pojo;
     }
 
     @SneakyThrows
-    public String getId(Object object) {
-        return ReflectionUtils.getValueAnnotationPresent(FirestoreId.class, object);
-    }
-
-    @SneakyThrows
-    private void setId(Object object, String id) {
-        ReflectionUtils.setValueAnnotationPresent(FirestoreId.class, object, id);
-    }
-
-
-
-
-
-    public T_COLLECTION findByDocumentId(Object documentId, Map<String, Query.Direction> orderByFields) {
-        T_COLLECTION existingObject = null;
-        if (documentId != null) { // if == null >> Failed to complete request: java.util.concurrent.ExecutionException:
-                                                        // com.google.api.gax.rpc.InvalidArgumentException:
-                                                        // io.grpc.StatusRuntimeException: INVALID_ARGUMENT: __key__ filter value must be a Key
-            if (documentId instanceof CharSequence) {
-                if (StringUtils.hasText((CharSequence) documentId)) {
-                    existingObject = whereEqualTo(FieldPath.documentId(), documentId, orderByFields).stream().findFirst().orElse(null);
-                }
-            } else {
-                existingObject = whereEqualTo(FieldPath.documentId(), documentId, orderByFields).stream().findFirst().orElse(null);
+    public void update(Filter filter, String field, Object value) {
+        CollectionReference collectionReference = getCollection();
+        List<QueryDocumentSnapshot> queryDocumentSnapshots = collectionReference.where(filter).get().get().getDocuments();
+        for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+            if (queryDocumentSnapshot.exists()) {
+                queryDocumentSnapshot.getReference().update(field, value);
             }
         }
-
-        return existingObject;
     }
-
-    public List<T_COLLECTION> findAll() {
-        return documentReferenceToObjects(listDocuments());
-    }
-
-    public List<T_COLLECTION> whereEqualTo(String field, Object value) {
-        return whereEqualTo(FieldPath.of(field), value, null);
-    }
-
-    @SneakyThrows
-    public List<T_COLLECTION> whereEqualTo(FieldPath fieldPath, Object value, Map<String, Query.Direction> orderByFields) {
-        return documentSnapshotToObjects(getOrderByQuery(orderByFields).whereEqualTo(fieldPath, value).get().get().getDocuments());
-    }
-
-    @SneakyThrows
-    public List<T_COLLECTION> whereIn(FieldPath fieldPath, List<? extends Object> values, Map<String, Query.Direction> orderByFields) {
-        List<QueryDocumentSnapshot> queryDocumentSnapshots = new ArrayList<>();
-        if (!values.isEmpty()) {
-            List<List<? extends Object>> documentIdsBatches = ListUtils.batches(values, 29);
-            for (List<?> batch : documentIdsBatches) {
-                queryDocumentSnapshots.addAll(getOrderByQuery(orderByFields).whereIn(fieldPath, batch).get().get().getDocuments());
-            }
-        }
-        return documentSnapshotToObjects(queryDocumentSnapshots);
-    }
-
-
-
 
     @SneakyThrows
     public List<T_COLLECTION> where(Object filterCriteria, Map<String, Query.Direction> orderByFields) {
@@ -172,31 +113,18 @@ public class FirestoreDataSource<T_COLLECTION> {
         return query;
     }
 
-    private Iterable<DocumentReference> listDocuments() {
-        return getCollection().listDocuments();
-    }
-
     private List<T_COLLECTION> documentSnapshotToObjects(Iterable<QueryDocumentSnapshot> queryDocumentSnapshots) {
         ArrayList<T_COLLECTION> results = new ArrayList<>();
         for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-            results.add(toObject(queryDocumentSnapshot.getReference()));
-        }
-        return results;
-    }
-
-    private List<T_COLLECTION> documentReferenceToObjects(Iterable<DocumentReference> documentReferences) {
-        ArrayList<T_COLLECTION> results = new ArrayList<>();
-        for (DocumentReference documentReference : documentReferences) {
-            results.add(toObject(documentReference));
+            results.add(toObject(queryDocumentSnapshot));
         }
         return results;
     }
 
     @SneakyThrows
-    private T_COLLECTION toObject(DocumentReference documentReference) {
-        DocumentSnapshot document = documentReference.get().get();
-        if(document.exists()) {
-            return document.toObject(collectionType);
+    private T_COLLECTION toObject(QueryDocumentSnapshot queryDocumentSnapshot) {
+        if(queryDocumentSnapshot.exists()) {
+            return queryDocumentSnapshot.toObject(collectionType);
         }
         else {
             return null;

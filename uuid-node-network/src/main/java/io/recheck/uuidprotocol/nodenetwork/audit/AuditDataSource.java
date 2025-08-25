@@ -2,7 +2,7 @@ package io.recheck.uuidprotocol.nodenetwork.audit;
 
 import com.google.cloud.firestore.Query;
 import io.recheck.uuidprotocol.common.firestore.FirestoreDataSource;
-import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
+import io.recheck.uuidprotocol.domain.audit.Audit;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,14 +20,14 @@ public class AuditDataSource<T extends Audit> extends FirestoreDataSource<T> {
         pojoAudit.setCreatedBy(certFingerprint);
         pojoAudit.setLastUpdatedAt(now);
         pojoAudit.setLastUpdatedBy(certFingerprint);
-        return createOrUpdate(pojoAudit);
+        return create(pojoAudit);
     }
 
     public T softDeleteAudit(T existingObject, String certFingerprint) {
         existingObject.setSoftDeleted(true);
         existingObject.setSoftDeleteBy(certFingerprint);
         existingObject.setSoftDeletedAt(Instant.now());
-        return createOrUpdate(existingObject);
+        return create(existingObject);
     }
 
     public List<T> findByDTOAndOrderByLastUpdatedAt(Object dto) {
