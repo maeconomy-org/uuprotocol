@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.domain.node.model;
+package io.recheck.uuidprotocol.domain.statements.model;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ public enum UUStatementPredicate {
             Map.entry(UUStatementPredicate.IS_ADDRESS_OF, UUStatementPredicate.HAS_ADDRESS)
     );
 
-    public UUStatementPredicate getOpposite(UUStatementPredicate uuStatementPredicate) {
+    public static UUStatementPredicate getOpposite(UUStatementPredicate uuStatementPredicate) {
         return oppositePredicateOf.get(uuStatementPredicate);
     }
 

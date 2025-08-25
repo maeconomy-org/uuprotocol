@@ -1,12 +1,11 @@
-package io.recheck.uuidprotocol.nodenetwork.statements;
+package io.recheck.uuidprotocol.domain.statements.model;
 
-import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UUStatementsClass {
+public class UUStatementsClassType {
 
     private Class subjectClass;
     private UUStatementPredicate predicate;

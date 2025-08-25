@@ -17,11 +17,7 @@ public class UUIDOwnerService {
 
     public UUIDOwner createUUID(String certFingerprint) {
         String uuid = UUID.randomUUID().toString();
-        return uuidOwnerDataSource.createOrUpdate(new UUIDOwner(uuid, certFingerprint));
-    }
-
-    public List<UUIDOwner> findAll() {
-        return uuidOwnerDataSource.findAll();
+        return uuidOwnerDataSource.create(new UUIDOwner(uuid, certFingerprint));
     }
 
     public UUIDOwner findByUUID(String uuid) {
@@ -32,24 +28,15 @@ public class UUIDOwnerService {
         return uuidOwnerDataSource.findByCertFingerprint(certFingerprint);
     }
 
-    public UUIDOwner updateNodeType(String uuid, String nodeType) {
-        UUIDOwner existingUUID = findByUUID(uuid);
-        if (existingUUID == null) {
-            throw new NotFoundException("UUID not found");
-        }
-        existingUUID.setNodeType(nodeType);
-        return uuidOwnerDataSource.createOrUpdate(existingUUID);
-    }
-
     public UUIDOwner validateOwnerUUID(String certFingerprint, String uuid) {
-        UUIDOwner existingUUID = findByUUID(uuid);
-        if (existingUUID == null) {
+        UUIDOwner existingUUIDOwner = findByUUID(uuid);
+        if (existingUUIDOwner == null) {
             throw new NotFoundException("UUID not found");
         }
-        if (!existingUUID.getCertFingerprint().equals(certFingerprint)) {
+        if (!existingUUIDOwner.getCertFingerprint().equals(certFingerprint)) {
             throw new ForbiddenException("The UUID does not belong to this client");
         }
-        return existingUUID;
+        return existingUUIDOwner;
     }
 
 }

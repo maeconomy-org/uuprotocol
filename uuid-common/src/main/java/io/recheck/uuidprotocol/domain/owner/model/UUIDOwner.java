@@ -12,9 +12,6 @@ import lombok.NoArgsConstructor;
 public class UUIDOwner {
 
     @FirestoreId
-    @JsonIgnore
-    private String id;
-
     private String uuid;
 
     @JsonIgnore

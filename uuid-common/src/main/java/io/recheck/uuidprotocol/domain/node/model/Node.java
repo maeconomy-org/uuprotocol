@@ -1,6 +1,6 @@
 package io.recheck.uuidprotocol.domain.node.model;
 
-import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
+import io.recheck.uuidprotocol.domain.audit.Audit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

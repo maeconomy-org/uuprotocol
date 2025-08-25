@@ -13,15 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class UUIDOwnerController {
 
     private final UUIDOwnerService uuidOwnerService;
+    private final UUIDOwnerDataSource uuidOwnerDataSource;
 
     @PostMapping
     public ResponseEntity<Object> createUUID(@AuthenticationPrincipal X509UserDetails user) {
         return ResponseEntity.ok(uuidOwnerService.createUUID(user.getCertFingerprint()));
-    }
-
-    @GetMapping
-    public ResponseEntity<Object> findAll() {
-        return ResponseEntity.ok(uuidOwnerService.findAll());
     }
 
     @GetMapping({"/own"})
@@ -49,7 +45,8 @@ public class UUIDOwnerController {
                                                                String uuid,
                                                        @RequestParam
                                                             String nodeType) {
-        return ResponseEntity.ok(uuidOwnerService.updateNodeType(uuid, nodeType));
+        uuidOwnerDataSource.updateNodeType(uuid, nodeType);
+        return ResponseEntity.ok().build();
     }
 
 }

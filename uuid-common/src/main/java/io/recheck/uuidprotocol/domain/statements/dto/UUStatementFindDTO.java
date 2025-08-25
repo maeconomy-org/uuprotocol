@@ -1,9 +1,7 @@
-package io.recheck.uuidprotocol.domain.node.dto;
+package io.recheck.uuidprotocol.domain.statements.dto;
 
-import io.recheck.uuidprotocol.domain.node.model.UUStatementPredicate;
-import io.recheck.uuidprotocol.domain.node.model.UUStatements;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatementPredicate;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatements;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,18 +11,19 @@ import org.springframework.beans.BeanUtils;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UUStatementDTO {
+public class UUStatementFindDTO {
 
-    @NotBlank
     @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
     private String subject;
 
-    @NotNull
     private UUStatementPredicate predicate;
 
-    @NotBlank
     @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
     private String object;
+
+    private Boolean softDeleted;
+
+    private String createdBy;
 
     public UUStatements build() {
         UUStatements uuStatements = new UUStatements();

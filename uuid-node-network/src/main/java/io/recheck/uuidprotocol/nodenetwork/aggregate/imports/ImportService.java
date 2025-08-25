@@ -3,9 +3,11 @@ package io.recheck.uuidprotocol.nodenetwork.aggregate.imports;
 import io.recheck.uuidprotocol.common.firestore.FirestoreDataSourceBatch;
 import io.recheck.uuidprotocol.common.firestore.FirestoreDataSourceBatchModel;
 import io.recheck.uuidprotocol.domain.aggregate.model.*;
+import io.recheck.uuidprotocol.domain.audit.Audit;
 import io.recheck.uuidprotocol.domain.node.model.*;
-import io.recheck.uuidprotocol.domain.node.model.audit.Audit;
 import io.recheck.uuidprotocol.domain.owner.model.UUIDOwner;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatementPredicate;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatements;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -204,14 +206,14 @@ public class ImportService {
         pojoAudit.setCreatedBy(certFingerprint);
         pojoAudit.setLastUpdatedAt(now);
         pojoAudit.setLastUpdatedBy(certFingerprint);
-        return firestoreDataSourceBatch.createOrUpdate(pojoAudit, batchModel);
+        return firestoreDataSourceBatch.create(pojoAudit, batchModel);
     }
 
     private UUIDOwner createUUID(String certFingerprint, String nodeType, FirestoreDataSourceBatchModel batchModel) {
         String uuid = UUID.randomUUID().toString();
         UUIDOwner uuidOwner = new UUIDOwner(uuid, certFingerprint);
         uuidOwner.setNodeType(nodeType);
-        return firestoreDataSourceBatch.createOrUpdate(uuidOwner, batchModel);
+        return firestoreDataSourceBatch.create(uuidOwner, batchModel);
     }
 
 }

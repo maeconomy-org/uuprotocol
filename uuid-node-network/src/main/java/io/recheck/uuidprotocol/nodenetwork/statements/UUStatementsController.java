@@ -1,8 +1,8 @@
 package io.recheck.uuidprotocol.nodenetwork.statements;
 
 import io.recheck.uuidprotocol.common.security.X509UserDetails;
-import io.recheck.uuidprotocol.domain.node.dto.UUStatementDTO;
-import io.recheck.uuidprotocol.domain.node.dto.UUStatementFindDTO;
+import io.recheck.uuidprotocol.domain.statements.dto.UUStatementDTO;
+import io.recheck.uuidprotocol.domain.statements.dto.UUStatementFindDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;

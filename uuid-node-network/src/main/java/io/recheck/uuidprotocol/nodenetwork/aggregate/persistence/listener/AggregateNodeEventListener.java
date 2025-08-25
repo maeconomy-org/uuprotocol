@@ -5,7 +5,6 @@ import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateReposi
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.UUAddressUpdate;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.UUNodeArrayDocUpdate;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.abstracton.AbstractOperation;
-import io.recheck.uuidprotocol.nodenetwork.audit.AuditEventListener;
 import io.recheck.uuidprotocol.nodenetwork.statements.UUStatementsDataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.LinkedMultiValueMap;
@@ -14,7 +13,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class AggregateNodeEventListener<TNode extends Node> implements AuditEventListener<TNode> {
+public class AggregateNodeEventListener<TNode extends Node> implements AggregateAuditEventListener<TNode> {
 
     protected final UUStatementsDataSource uuStatementsDataSource;
     protected final AggregateRepository aggregateRepository;
