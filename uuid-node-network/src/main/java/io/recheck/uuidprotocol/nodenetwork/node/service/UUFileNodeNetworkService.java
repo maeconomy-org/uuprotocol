@@ -3,9 +3,12 @@ package io.recheck.uuidprotocol.nodenetwork.node.service;
 import io.recheck.uuidprotocol.common.security.X509UserDetails;
 import io.recheck.uuidprotocol.domain.node.dto.UUFileDTO;
 import io.recheck.uuidprotocol.domain.node.model.UUFile;
+import io.recheck.uuidprotocol.domain.statements.dto.UUStatementDTO;
+import io.recheck.uuidprotocol.domain.statements.model.UUStatementPredicate;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener.AggregateUUFileEventListener;
 import io.recheck.uuidprotocol.nodenetwork.node.persistence.UUFileDataSource;
 import io.recheck.uuidprotocol.nodenetwork.owner.UUIDOwnerService;
+import io.recheck.uuidprotocol.nodenetwork.statements.UUStatementsService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -20,20 +23,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 @Service
 public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileDTO>{
 
     private final Path storageDir;
     private final String serverAddress;
+    private final UUStatementsService uuStatementsService;
 
     @SneakyThrows
     public UUFileNodeNetworkService(@Value("${UUFileNodeNetworkService.storageDirProperty}") String storageDirProperty,
                                     @Value("${UUFileNodeNetworkService.serverAddressProperty}") String serverAddressProperty,
                                     UUFileDataSource uuFileDataSource,
                                     AggregateUUFileEventListener aggregateUUFileEventListener,
-                                    UUIDOwnerService uuidOwnerService) {
+                                    UUIDOwnerService uuidOwnerService,
+                                    UUStatementsService uuStatementsService) {
         super(uuFileDataSource, aggregateUUFileEventListener, uuidOwnerService);
+        this.uuStatementsService = uuStatementsService;
         serverAddress = serverAddressProperty;
         storageDir = Paths.get(storageDirProperty);
         if (! new UrlResource(storageDir.toUri()).exists()) {
@@ -42,22 +49,28 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
     }
 
     @SneakyThrows
-    public UUFile storeOrReplaceFile(String uuid, MultipartFile file, X509UserDetails user) {
+    public UUFile storeOrReplaceFile(String uuidToAttach, String uuidFile, MultipartFile file, X509UserDetails user) {
         if (file.getSize() > 100 * 1024 * 1024) {
             throw new IllegalArgumentException("File too large (max 100MB)");
         }
 
         UUFileDTO uuFileDTO = new UUFileDTO();
-        uuFileDTO.setUuid(uuid);
+        uuFileDTO.setUuid(uuidFile);
         uuFileDTO.setFileName(file.getOriginalFilename());
         uuFileDTO.setContentType(file.getContentType());
         uuFileDTO.setSize(file.getSize());
-        uuFileDTO.setFileReference(String.format("%s/api/UUFile/download/%s", serverAddress, uuid));
+        uuFileDTO.setFileReference(String.format("%s/api/UUFile/download/%s", serverAddress, uuidFile));
 
         UUFile uuFile = softDeleteAndCreate(uuFileDTO, user.getCertFingerprint());
 
+        UUStatementDTO uuStatementDTO = new UUStatementDTO();
+        uuStatementDTO.setObject(uuidToAttach);
+        uuStatementDTO.setPredicate(UUStatementPredicate.HAS_FILE);
+        uuStatementDTO.setObject(uuidFile);
+        uuStatementsService.findOrCreateWithOpposite(List.of(uuStatementDTO), user.getCertFingerprint());
+
         // Save new file
-        Path fileUUIDDirectory = storageDir.resolve(uuid);
+        Path fileUUIDDirectory = storageDir.resolve(uuidFile);
         if (! new UrlResource(fileUUIDDirectory.toUri()).exists()) {
             Files.createDirectory(fileUUIDDirectory);
         }
