@@ -1,10 +1,8 @@
 package io.recheck.uuidprotocol.domain.aggregate.model;
 
-import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -32,11 +30,5 @@ public class AggregateEntity extends AggregateUUObject {
     private List<AggregateUUProperty> properties = new ArrayList<>();
 
     private List<AggregateUUObject> history = new ArrayList<>();
-
-    public static AggregateEntity buildFromUUObject(UUObject uuObject) {
-        AggregateEntity aggregateEntity = new AggregateEntity();
-        BeanUtils.copyProperties(uuObject, aggregateEntity);
-        return aggregateEntity;
-    }
 
 }

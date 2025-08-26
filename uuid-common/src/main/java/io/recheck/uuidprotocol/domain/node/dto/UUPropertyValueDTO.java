@@ -1,10 +1,10 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
 
+import io.recheck.uuidprotocol.common.utils.BeanUtilsCommon;
 import io.recheck.uuidprotocol.domain.node.model.UUPropertyValue;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.beans.BeanUtils;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -18,7 +18,7 @@ public class UUPropertyValueDTO extends NodeDTO<UUPropertyValue> {
 
     public UUPropertyValue build() {
         UUPropertyValue uuPropertyValue = new UUPropertyValue();
-        BeanUtils.copyProperties(this, uuPropertyValue);
+        BeanUtilsCommon.copyMatchingPropertiesDeep(this, uuPropertyValue);
         return uuPropertyValue;
     }
 

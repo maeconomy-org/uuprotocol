@@ -1,12 +1,10 @@
 package io.recheck.uuidprotocol.domain.statements.dto;
 
 import io.recheck.uuidprotocol.domain.statements.model.UUStatementPredicate;
-import io.recheck.uuidprotocol.domain.statements.model.UUStatements;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
 
 @Data
 @AllArgsConstructor
@@ -24,11 +22,5 @@ public class UUStatementFindDTO {
     private Boolean softDeleted;
 
     private String createdBy;
-
-    public UUStatements build() {
-        UUStatements uuStatements = new UUStatements();
-        BeanUtils.copyProperties(this, uuStatements);
-        return uuStatements;
-    }
 
 }

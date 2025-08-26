@@ -1,10 +1,10 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
+import io.recheck.uuidprotocol.common.utils.BeanUtilsCommon;
 import io.recheck.uuidprotocol.domain.node.model.UUProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.beans.BeanUtils;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -27,7 +27,7 @@ public class UUPropertyDTO extends NodeDTO<UUProperty> {
 
     public UUProperty build() {
         UUProperty uuProperty = new UUProperty();
-        BeanUtils.copyProperties(this, uuProperty);
+        BeanUtilsCommon.copyMatchingPropertiesDeep(this, uuProperty);
         return uuProperty;
     }
 

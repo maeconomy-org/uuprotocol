@@ -13,6 +13,6 @@ public class AggregateUUPropertyValue extends AggregateNode {
     private String value;
     private String valueTypeCast;
     private String sourceType;
-    List<AggregateUUFile> files = new ArrayList<>();
+    private List<AggregateUUFile> files = new ArrayList<>();
 
 }

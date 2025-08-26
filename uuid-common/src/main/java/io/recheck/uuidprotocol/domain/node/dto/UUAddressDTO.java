@@ -1,9 +1,9 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
+import io.recheck.uuidprotocol.common.utils.BeanUtilsCommon;
 import io.recheck.uuidprotocol.domain.node.model.UUAddress;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.beans.BeanUtils;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -21,7 +21,7 @@ public class UUAddressDTO extends NodeDTO<UUAddress> {
     @Override
     public UUAddress build() {
         UUAddress uuAddress = new UUAddress();
-        BeanUtils.copyProperties(this, uuAddress);
+        BeanUtilsCommon.copyMatchingPropertiesDeep(this, uuAddress);
         return uuAddress;
     }
 }

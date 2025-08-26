@@ -1,9 +1,9 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
+import io.recheck.uuidprotocol.common.utils.BeanUtilsCommon;
 import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.beans.BeanUtils;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -19,7 +19,7 @@ public class UUObjectDTO extends NodeDTO<UUObject> {
 
     public UUObject build() {
         UUObject uuObject = new UUObject();
-        BeanUtils.copyProperties(this, uuObject);
+        BeanUtilsCommon.copyMatchingPropertiesDeep(this, uuObject);
         return uuObject;
     }
 
