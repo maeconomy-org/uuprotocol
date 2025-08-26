@@ -50,10 +50,6 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
 
     @SneakyThrows
     public UUFile storeOrReplaceFile(String uuidToAttach, String uuidFile, MultipartFile file, X509UserDetails user) {
-        if (file.getSize() > 100 * 1024 * 1024) {
-            throw new IllegalArgumentException("File too large (max 100MB)");
-        }
-
         UUFileDTO uuFileDTO = new UUFileDTO();
         uuFileDTO.setUuid(uuidFile);
         uuFileDTO.setFileName(file.getOriginalFilename());
