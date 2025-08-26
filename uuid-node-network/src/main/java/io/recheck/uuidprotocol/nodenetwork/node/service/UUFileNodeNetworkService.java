@@ -64,7 +64,7 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
         UUFile uuFile = softDeleteAndCreate(uuFileDTO, user.getCertFingerprint());
 
         UUStatementDTO uuStatementDTO = new UUStatementDTO();
-        uuStatementDTO.setObject(uuidToAttach);
+        uuStatementDTO.setSubject(uuidToAttach);
         uuStatementDTO.setPredicate(UUStatementPredicate.HAS_FILE);
         uuStatementDTO.setObject(uuidFile);
         uuStatementsService.findOrCreateWithOpposite(List.of(uuStatementDTO), user.getCertFingerprint());
