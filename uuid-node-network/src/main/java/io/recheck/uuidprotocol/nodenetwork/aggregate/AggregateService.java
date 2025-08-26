@@ -118,7 +118,7 @@ public class AggregateService {
     private <T_NODE extends Node, T_AGG extends AggregateNode> T_NODE createNode(T_AGG aggNode, Class<T_NODE> nodeClass, String certFingerprint, FirestoreDataSourceBatchModel batchModel) {
         T_NODE node = BeanUtils.instantiateClass(nodeClass);
         BeanUtilsCommon.copyMatchingPropertiesDeep(aggNode, node);
-        node.setUuid(createUUID(certFingerprint, UUObject.class.getSimpleName(), batchModel).getUuid());
+        node.setUuid(createUUID(certFingerprint, nodeClass.getSimpleName(), batchModel).getUuid());
 
         node = createAudit(node, certFingerprint, batchModel);
         return node;
