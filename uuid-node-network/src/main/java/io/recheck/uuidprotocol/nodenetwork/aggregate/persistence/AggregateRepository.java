@@ -3,7 +3,6 @@ package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence;
 import io.recheck.uuidprotocol.common.mongodb.MongoUtils;
 import io.recheck.uuidprotocol.domain.aggregate.dto.AggregateFindDTO;
 import io.recheck.uuidprotocol.domain.aggregate.model.AggregateEntity;
-import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.domain.*;
@@ -107,14 +106,14 @@ public class AggregateRepository {
         return new PageImpl<>(results.getMappedResults(), pageable, total);
     }
 
-    public void saveAll(List<AggregateEntity> aggregateEntityList) {
+    public void createMultiple(List<AggregateEntity> aggregateEntityList) {
         mongoTemplate.insertAll(aggregateEntityList);
     }
 
-    public void insertIfNotFound(UUObject uuObject) {
-        List<AggregateEntity> aggregateEntities = mongoTemplate.find(new Query(Criteria.where("uuid").is(uuObject.getUuid())), AggregateEntity.class);
+    public void createIfNotFound(AggregateEntity aggregateEntity) {
+        List<AggregateEntity> aggregateEntities = mongoTemplate.find(new Query(Criteria.where("uuid").is(aggregateEntity.getUuid())), AggregateEntity.class);
         if (aggregateEntities.isEmpty()) {
-            mongoTemplate.getCollection(AggregateEntity.class.getSimpleName()).insertOne(MongoUtils.convertToDocument(AggregateEntity.buildFromUUObject(uuObject)));
+            mongoTemplate.getCollection(AggregateEntity.class.getSimpleName()).insertOne(MongoUtils.convertToDocument(aggregateEntity));
         }
     }
 

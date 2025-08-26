@@ -12,4 +12,12 @@ public class UUStatements extends Audit {
     private UUStatementPredicate predicate;
     private String object;
 
+    public UUStatements buildOpposite() {
+        UUStatements uuStatementOpposite = new UUStatements();
+        uuStatementOpposite.setSubject(getObject());
+        uuStatementOpposite.setPredicate(UUStatementPredicate.getOpposite(getPredicate()));
+        uuStatementOpposite.setObject(getSubject());
+        return uuStatementOpposite;
+    }
+
 }

@@ -1,14 +1,14 @@
-package io.recheck.uuidprotocol.domain.aggregate.model;
+package io.recheck.uuidprotocol.domain.aggregate.dto.create;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class AggregateUUProperty extends AggregateNode {
+@NoArgsConstructor
+public class AggregateUUPropertyCreateDTO {
 
     private String key;
 
@@ -22,7 +22,7 @@ public class AggregateUUProperty extends AggregateNode {
     private int processingOrderPosition;
     private int viewOrderPosition;
 
-    private List<AggregateUUPropertyValue> values = new ArrayList<>();
-    private List<AggregateUUFile> files = new ArrayList<>();
+    List<AggregateUUPropertyValueCreateDTO> values = new ArrayList<>();
+    List<AggregateUUFileCreateDTO> files = new ArrayList<>();
 
 }

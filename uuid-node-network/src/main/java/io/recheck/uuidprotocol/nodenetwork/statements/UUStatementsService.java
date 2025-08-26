@@ -36,9 +36,10 @@ public class UUStatementsService {
         for (UUStatementDTO uuStatementDTO : uuStatementsSet) {
             //exclude validation of owning uuids - everyone could make statements
             //validateOwnerUUID(uuStatementDTO, certFingerprint);
+            UUStatements uuStatements = uuStatementDTO.build();
             validateStatement(uuStatementDTO.getSubject(), uuStatementDTO.getPredicate(), uuStatementDTO.getObject());
-            uuStatementsList.add(findOrCreate(uuStatementDTO.build(), certFingerprint));
-            uuStatementsList.add(findOrCreate(uuStatementDTO.buildOpposite(), certFingerprint));
+            uuStatementsList.add(findOrCreate(uuStatements, certFingerprint));
+            uuStatementsList.add(findOrCreate(uuStatements.buildOpposite(), certFingerprint));
         }
 
         return uuStatementsList;
@@ -49,8 +50,10 @@ public class UUStatementsService {
         //validateOwnerUUID(uuStatementDTO, certFingerprint);
 
         List<UUStatements> uuStatementsList = new ArrayList<>();
-        uuStatementsList.add(softDelete(uuStatementDTO.build(), certFingerprint));
-        uuStatementsList.add(softDelete(uuStatementDTO.buildOpposite(), certFingerprint));
+
+        UUStatements uuStatements = uuStatementDTO.build();
+        uuStatementsList.add(softDelete(uuStatements, certFingerprint));
+        uuStatementsList.add(softDelete(uuStatements.buildOpposite(), certFingerprint));
 
         return uuStatementsList;
     }

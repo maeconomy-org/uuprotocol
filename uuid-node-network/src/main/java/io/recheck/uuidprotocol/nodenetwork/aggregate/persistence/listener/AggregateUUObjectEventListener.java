@@ -1,5 +1,7 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener;
 
+import io.recheck.uuidprotocol.common.utils.BeanUtilsCommon;
+import io.recheck.uuidprotocol.domain.aggregate.model.AggregateEntity;
 import io.recheck.uuidprotocol.domain.node.model.UUObject;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateRepository;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.operation.HistoryCreate;
@@ -27,7 +29,9 @@ public class AggregateUUObjectEventListener extends AggregateNodeEventListener<U
 
     @Override
     public void postCreate(UUObject uuNode) {
-        aggregateRepository.insertIfNotFound(uuNode);
+        AggregateEntity aggregateEntity = new AggregateEntity();
+        BeanUtilsCommon.copyMatchingPropertiesDeep(uuNode, aggregateEntity);
+        aggregateRepository.createIfNotFound(aggregateEntity);
     }
 
     @Override
