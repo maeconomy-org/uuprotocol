@@ -19,14 +19,17 @@ public class UUFileController extends NodeController<UUFile, UUFileDTO> {
         super(uuFileNodeNetworkService, uuFileDataSource);
     }
 
-    @PostMapping("/upload/{uuid}")
+    @PostMapping("/upload")
     public ResponseEntity<Object> uploadFile(
-            @PathVariable
+            @RequestParam
             @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-                    String uuid,
+                    String uuidFile,
+            @RequestParam
+            @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+                    String uuidToAttach,
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(((UUFileNodeNetworkService) nodeNetworkService).storeOrReplaceFile(uuid, file, user));
+        return ResponseEntity.ok(((UUFileNodeNetworkService) nodeNetworkService).storeOrReplaceFile(uuidToAttach, uuidFile, file, user));
     }
 
     @GetMapping("/download/{uuid}")
