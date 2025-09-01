@@ -57,13 +57,13 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
         uuFileDTO.setSize(file.getSize());
         uuFileDTO.setFileReference(String.format("%s/api/UUFile/download/%s", serverAddress, uuidFile));
 
-        UUFile uuFile = softDeleteAndCreate(uuFileDTO, user.getCertFingerprint());
+        UUFile uuFile = softDeleteAndCreate(uuFileDTO, user.getCertificate().getCertificateSha256());
 
         UUStatementDTO uuStatementDTO = new UUStatementDTO();
         uuStatementDTO.setSubject(uuidToAttach);
         uuStatementDTO.setPredicate(UUStatementPredicate.HAS_FILE);
         uuStatementDTO.setObject(uuidFile);
-        uuStatementsService.findOrCreateWithOpposite(List.of(uuStatementDTO), user.getCertFingerprint());
+        uuStatementsService.findOrCreateWithOpposite(List.of(uuStatementDTO), user.getCertificate().getCertificateSha256());
 
         // Save new file
         Path fileUUIDDirectory = storageDir.resolve(uuidFile);
@@ -83,7 +83,7 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
 
     @SneakyThrows
     public ResponseEntity<Resource> downloadFile(X509UserDetails user, String uuid) {
-        uuidOwnerService.validateOwnerUUID(user.getCertFingerprint(), uuid);
+        uuidOwnerService.validateOwnerUUID(user.getCertificate().getCertificateSha256(), uuid);
         UUFile last = dataSource.findLast(uuid);
         if (last == null) {
             return ResponseEntity.notFound().build();

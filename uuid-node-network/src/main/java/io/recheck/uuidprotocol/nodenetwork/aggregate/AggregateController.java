@@ -35,7 +35,7 @@ public class AggregateController {
 
     @PostMapping
     public ResponseEntity<AggregateEntity> create(@RequestBody AggregateEntityCreateDTO aggregateEntityCreateDTO, @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(aggregateService.create(aggregateEntityCreateDTO, user.getCertFingerprint()));
+        return ResponseEntity.ok(aggregateService.create(aggregateEntityCreateDTO, user.getCertificate().getCertificateSha256()));
     }
 
     @PostMapping({"/Import"})

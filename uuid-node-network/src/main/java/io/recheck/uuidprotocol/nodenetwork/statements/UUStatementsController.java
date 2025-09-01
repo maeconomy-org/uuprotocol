@@ -22,12 +22,12 @@ public class UUStatementsController {
 
     @PostMapping
     public ResponseEntity<Object> findOrCreate(@Valid @RequestBody @NotEmpty List<UUStatementDTO> uuStatementDTOList, @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(uuStatementsService.findOrCreateWithOpposite(uuStatementDTOList, user.getCertFingerprint()));
+        return ResponseEntity.ok(uuStatementsService.findOrCreateWithOpposite(uuStatementDTOList, user.getCertificate().getCertificateSha256()));
     }
 
     @DeleteMapping
     public ResponseEntity<Object> softDelete(@Valid @RequestBody UUStatementDTO uuStatementDTO, @AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(uuStatementsService.softDeleteWithOpposite(uuStatementDTO, user.getCertFingerprint()));
+        return ResponseEntity.ok(uuStatementsService.softDeleteWithOpposite(uuStatementDTO, user.getCertificate().getCertificateSha256()));
     }
 
     @GetMapping
