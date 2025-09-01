@@ -32,7 +32,7 @@ public class X509ClientsSecurityConfiguration {
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests.anyRequest().authenticated()
                 )
-                .x509(x509 -> x509.authenticationUserDetailsService(new X509UserDetailsService()))
+                .with(new X509ConfigurerCustom<>(), httpSecurityX509ConfigurerCustom -> {})
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.NEVER))
                 .csrf(AbstractHttpConfigurer::disable);

@@ -17,12 +17,12 @@ public class UUIDOwnerController {
 
     @PostMapping
     public ResponseEntity<Object> createUUID(@AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(uuidOwnerService.createUUID(user.getCertFingerprint()));
+        return ResponseEntity.ok(uuidOwnerService.createUUID(user.getCertificate().getCertificateSha256()));
     }
 
     @GetMapping({"/own"})
     public ResponseEntity<Object> findByOwner(@AuthenticationPrincipal X509UserDetails user) {
-        return ResponseEntity.ok(uuidOwnerService.findByOwner(user.getCertFingerprint()));
+        return ResponseEntity.ok(uuidOwnerService.findByOwner(user.getCertificate().getCertificateSha256()));
     }
 
     @GetMapping({"/{uuid}"})

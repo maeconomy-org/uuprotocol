@@ -1,22 +1,17 @@
 package io.recheck.uuidprotocol.common.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.recheck.uuidprotocol.common.security.certificate.CertificateInfo;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 
 @Data
 public class X509UserDetails implements UserDetails {
 
-    @JsonIgnore
-    private final X509Certificate certificate;
-
-    private final String certFingerprint;
-
-    private final String certCommonName;
+    private final CertificateInfo certificate;
 
     private final Collection<? extends GrantedAuthority> authorities;
 
