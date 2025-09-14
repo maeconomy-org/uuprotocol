@@ -33,8 +33,8 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
     private final UUStatementsService uuStatementsService;
 
     @SneakyThrows
-    public UUFileNodeNetworkService(@Value("${UUFileNodeNetworkService.storageDirProperty}") String storageDirProperty,
-                                    @Value("${UUFileNodeNetworkService.serverAddressProperty}") String serverAddressProperty,
+    public UUFileNodeNetworkService(@Value("${uufile-node-network-service.storage-dir-property}") String storageDirProperty,
+                                    @Value("${uufile-node-network-service.server-address-property}") String serverAddressProperty,
                                     UUFileDataSource uuFileDataSource,
                                     AggregateUUFileEventListener aggregateUUFileEventListener,
                                     UUIDOwnerService uuidOwnerService,

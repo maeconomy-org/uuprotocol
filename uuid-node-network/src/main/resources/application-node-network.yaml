@@ -1,12 +1,22 @@
 server:
   port: 9443
+  ssl:
+    client-auth: need
+    bundle: "uuid-node-network"
 
 spring:
   servlet:
     multipart:
-      max-file-size: 104857600
-      max-request-size: 104857600
+      max-file-size: <max-file-size>
+      max-request-size: <max-request-size>
 
-UUFileNodeNetworkService:
-  serverAddressProperty: ""
-  storageDirProperty: filestorage
+uufile-node-network-service:
+  server-address-property: <serverAddressProperty>
+  storage-dir-property: <storageDirProperty>
+
+uuid-owner-service-config:
+  server-spec:
+    base-address: <baseAddress>
+    ssl:
+      bundle: "uuid-owner"
+      alias: <alias>

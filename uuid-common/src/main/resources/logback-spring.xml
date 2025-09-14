@@ -1,13 +1,15 @@
 <configuration>
 
-    <property name="BASE_DIR" value="logs"/>
+    <springProperty scope="context" name="logging.file.path" source="logging.file.path"/>
+    <springProperty scope="context" name="logging.file.name" source="logging.file.name"/>
+
     <property name="PATTERN" value="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
 
     <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${BASE_DIR}/uuid-owner.log</file>
+        <file>${logging.file.path}/${logging.file.name}.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${BASE_DIR}/archived/uuid-owner.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${logging.file.path}/archived/${logging.file.name}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!-- each archived file, size max 10MB -->
             <maxFileSize>10MB</maxFileSize>
             <!-- total size of all archive files, if total size > 1GB, it will delete old archived file -->

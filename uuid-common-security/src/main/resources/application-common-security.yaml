@@ -1,0 +1,32 @@
+spring:
+  ssl:
+    bundle:
+      jks:
+
+        uuid-owner:
+          reload-on-update: true
+          key:
+            alias: <alias>
+          keystore:
+            location: <location>
+            password: <password>
+
+          truststore:
+            location: <location>
+            password: <password>
+
+        uuid-node-network:
+          reload-on-update: true
+          key:
+            alias: <alias>
+          keystore:
+            location: <location>
+            password: <password>
+
+          truststore:
+            location: <location>
+            password: <password>
+
+security:
+  headers:
+    hsts: NONE
