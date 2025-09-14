@@ -9,7 +9,7 @@ import org.springframework.core.io.Resource;
 
 @Data
 @Configuration
-@PropertySource(value = "application-common.yaml", factory = YamlPropertySourceFactory.class)
+@PropertySource(value = "application-common-${spring.profiles.active}.yaml", factory = YamlPropertySourceFactory.class)
 @ConfigurationProperties(prefix = "gcp.firebase")
 public class FirebaseProperties {
 

@@ -1,5 +1,6 @@
-package io.recheck.uuidprotocol.common.security;
+package io.recheck.uuidprotocol.common.security.filter;
 
+import io.recheck.uuidprotocol.common.security.X509UserDetailsService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;

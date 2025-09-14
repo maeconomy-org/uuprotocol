@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.common.security;
+package io.recheck.uuidprotocol.common.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

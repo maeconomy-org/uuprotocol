@@ -1,0 +1,7 @@
+gcp:
+  firebase:
+    service-account: classpath:service-account-....json
+
+mongodb:
+  connectionString: <connectionString>
+  databaseName: <databaseName>

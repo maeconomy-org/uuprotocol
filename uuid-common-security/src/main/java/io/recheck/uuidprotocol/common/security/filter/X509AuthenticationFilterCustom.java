@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.common.security;
+package io.recheck.uuidprotocol.common.security.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.authentication.preauth.x509.SubjectDnX509PrincipalExtractor;

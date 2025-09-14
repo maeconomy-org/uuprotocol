@@ -1,9 +1,11 @@
 ############ Application specific
 
-/uuid-common/src/main/resources/
-/uuid-common-security/src/main/resources/
-/uuid-node-network/src/main/resources/uuidowner-server-configuration.yaml
+/uuid-common/src/main/resources/service-account-*.json
+/uuid-common/src/main/resources/application-common-*.yaml
+/uuid-common-security/src/main/resources/application-common-security-*.yaml
+/uuid-node-network/src/main/resources/application-node-network-*.yaml
 /filestorage
+/logs
 
 
 /target/

@@ -1,5 +1,6 @@
 package io.recheck.uuidprotocol.common.security;
 
+import io.recheck.uuidprotocol.common.security.filter.X509ConfigurerCustom;
 import io.recheck.uuidprotocol.common.yaml.YamlPropertySourceFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@PropertySource(value = {"application-common-security.yaml"}, factory = YamlPropertySourceFactory.class)
+@PropertySource(value = {"application-common-security-${spring.profiles.active}.yaml"}, factory = YamlPropertySourceFactory.class)
 public class X509ClientsSecurityConfiguration {
 
     @Bean
