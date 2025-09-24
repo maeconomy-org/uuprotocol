@@ -1,5 +1,6 @@
 package io.recheck.uuidprotocol.domain.aggregate.model;
 
+import io.recheck.uuidprotocol.domain.audit.AuditUser;
 import lombok.Data;
 
 import java.time.Instant;
@@ -8,11 +9,11 @@ import java.time.Instant;
 public class AggregateAudit {
 
     private Instant createdAt;
-    private String createdBy;
+    private AuditUser createdBy;
     private Instant lastUpdatedAt;
-    private String lastUpdatedBy;
+    private AuditUser lastUpdatedBy;
     private Instant softDeletedAt;
-    private String softDeleteBy;
+    private AuditUser softDeleteBy;
     private Boolean softDeleted = false;
 
 }

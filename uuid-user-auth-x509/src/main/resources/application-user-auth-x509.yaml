@@ -1,0 +1,20 @@
+spring:
+  ssl:
+    bundle:
+      jks:
+
+        uuid-service-registrar-truststore-server:
+          reload-on-update: true
+          truststore:
+            location: <location>
+            password: <password>
+
+        uuid-service-node-network-truststore-server:
+          reload-on-update: true
+          truststore:
+            location: <location>
+            password: <password>
+
+security:
+  headers:
+    hsts: NONE
