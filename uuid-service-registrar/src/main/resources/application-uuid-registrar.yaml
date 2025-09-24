@@ -1,0 +1,6 @@
+server:
+  port: 8443
+  ssl:
+    bundle: "uuid-service-registrar-keystore-server"
+
+server-ssl-truststore-bundle: "uuid-service-registrar-truststore-server"

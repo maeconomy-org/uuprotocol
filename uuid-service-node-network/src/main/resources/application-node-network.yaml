@@ -1,0 +1,24 @@
+server:
+  port: 9443
+  ssl:
+    client-auth: need
+    bundle: "uuid-service-node-network-keystore-server"
+
+server-ssl-truststore-bundle: "uuid-service-node-network-truststore-server"
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: <max-file-size>
+      max-request-size: <max-request-size>
+
+uufile-node-network-service:
+  server-address-property: <serverAddressProperty>
+  storage-dir-property: <storageDirProperty>
+
+uuid-service-registrar-config:
+  server-spec:
+    base-address: <baseAddress>
+    ssl:
+      bundle: "uuid-service-registrar-keystore-server"
+      alias: <alias>

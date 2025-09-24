@@ -2,8 +2,9 @@
 
 /uuid-common/src/main/resources/service-account-*.json
 /uuid-common/src/main/resources/application-common-*.yaml
-/uuid-common-security/src/main/resources/application-common-security-*.yaml
-/uuid-node-network/src/main/resources/application-node-network-*.yaml
+/uuid-common-security/src/main/resources/application-security-*.yaml
+/uuid-user-auth-x509/src/main/resources/application-user-auth-x509-*.yaml
+/uuid-service-node-network/src/main/resources/application-node-network-*.yaml
 /filestorage
 /logs
 

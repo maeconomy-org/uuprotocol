@@ -1,6 +1,7 @@
 package io.recheck.uuidprotocol.domain.statements.dto;
 
 import io.recheck.uuidprotocol.common.utils.BeanUtilsCommon;
+import io.recheck.uuidprotocol.domain.registrar.model.UUIDRegExp;
 import io.recheck.uuidprotocol.domain.statements.model.UUStatementPredicate;
 import io.recheck.uuidprotocol.domain.statements.model.UUStatements;
 import jakarta.validation.constraints.NotBlank;
@@ -16,14 +17,14 @@ import lombok.NoArgsConstructor;
 public class UUStatementDTO {
 
     @NotBlank
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+    @Pattern(regexp = UUIDRegExp.re)
     private String subject;
 
     @NotNull
     private UUStatementPredicate predicate;
 
     @NotBlank
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+    @Pattern(regexp = UUIDRegExp.re)
     private String object;
 
     public UUStatements build() {

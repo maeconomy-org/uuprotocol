@@ -1,5 +1,0 @@
-server:
-  port: 8443
-  ssl:
-    client-auth: need
-    bundle: "uuid-owner"

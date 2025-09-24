@@ -31,6 +31,11 @@
                 <artifactId>uuid-common-security</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.recheck.uuidprotocol</groupId>
+                <artifactId>uuid-user-auth-x509</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -67,10 +72,11 @@
 
 
     <modules>
-        <module>uuid-owner</module>
-        <module>uuid-node-network</module>
         <module>uuid-common</module>
+        <module>uuid-user-auth-x509</module>
         <module>uuid-common-security</module>
+        <module>uuid-service-registrar</module>
+        <module>uuid-service-node-network</module>
     </modules>
 
 </project>
