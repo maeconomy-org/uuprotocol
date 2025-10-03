@@ -12,7 +12,7 @@ public class AuditUser {
     private String credentials;
 
     public AuditUser(UserDetailsCustom userDetailsCustom) {
-        this.userUUID = userDetailsCustom.getUserUuid();
+        this.userUUID = userDetailsCustom.getUserUUID();
         this.credentials = (String) userDetailsCustom.getCredentials();
     }
 

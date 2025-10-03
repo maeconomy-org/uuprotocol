@@ -1,9 +1,9 @@
 package io.recheck.uuidprotocol.service.registrar;
 
+import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordAuthorizePostRequestDTO;
 import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordMetaPutRequestDTO;
 import io.recheck.uuidprotocol.domain.registrar.model.UUIDRegExp;
 import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
-import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordAuthorizePostRequestDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +21,12 @@ public class RegistrarController {
 
     @PostMapping
     public ResponseEntity<Object> create(@AuthenticationPrincipal UserDetailsCustom user) {
-        return ResponseEntity.ok(registrarService.createUUID(user));
+        return ResponseEntity.ok(registrarService.create(user));
     }
 
     @GetMapping({"/own"})
     public ResponseEntity<Object> findByOwnerUuid(@AuthenticationPrincipal UserDetailsCustom user) {
-        return ResponseEntity.ok(registrarDataSource.findByOwnerUuid(user.getUserUuid()));
+        return ResponseEntity.ok(registrarDataSource.findByOwnerUUID(user.getUserUUID()));
     }
 
     @GetMapping({"/{uuid}"})

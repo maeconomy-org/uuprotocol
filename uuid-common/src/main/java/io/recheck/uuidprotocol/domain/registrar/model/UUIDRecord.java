@@ -16,7 +16,7 @@ public class UUIDRecord extends Audit {
     @FirestoreId
     private String uuid;
 
-    private String ownerUuid;
+    private String ownerUUID;
 
     private UUIDRecordMeta uuidRecordMeta;
 

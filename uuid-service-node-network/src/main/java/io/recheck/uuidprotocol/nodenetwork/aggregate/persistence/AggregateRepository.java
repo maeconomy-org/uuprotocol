@@ -3,6 +3,7 @@ package io.recheck.uuidprotocol.nodenetwork.aggregate.persistence;
 import io.recheck.uuidprotocol.common.mongodb.MongoUtils;
 import io.recheck.uuidprotocol.domain.aggregate.dto.AggregateFindDTO;
 import io.recheck.uuidprotocol.domain.aggregate.model.AggregateEntity;
+import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.domain.*;
@@ -43,7 +44,7 @@ public class AggregateRepository {
         return mongoTemplate.find(query, AggregateEntity.class);
     }
 
-    public Page<AggregateEntity> find(AggregateFindDTO aggregateFindDTO) {
+    public Page<AggregateEntity> find(UserDetailsCustom user, AggregateFindDTO aggregateFindDTO) {
         List<AggregationOperation> stages = new ArrayList<>();
 
         if (StringUtils.hasText(aggregateFindDTO.getSearchTerm())) {
@@ -81,9 +82,9 @@ public class AggregateRepository {
         if (Boolean.FALSE.equals(aggregateFindDTO.getHasHistory())) {
             stages.add(new AddFieldsOperation("history", new ArrayList<>()));
         }
-        if (aggregateFindDTO.getCreatedBy() != null) {
-            stages.add(Aggregation.match(Criteria.where("createdBy.userUUID").is(aggregateFindDTO.getCreatedBy().getUserUUID())));
-        }
+
+        stages.add(Aggregation.match(Criteria.where("createdBy.userUUID").is(user.getUserUUID())));
+
         stages.add(Aggregation.sort(Sort.by(Sort.Direction.DESC, "$createdAt")));
 
         //get total

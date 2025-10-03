@@ -1,7 +1,5 @@
 package io.recheck.uuidprotocol.domain.registrar.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.recheck.uuidprotocol.domain.registrar.model.PermissionType;
 import io.recheck.uuidprotocol.domain.registrar.model.UUIDRegExp;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

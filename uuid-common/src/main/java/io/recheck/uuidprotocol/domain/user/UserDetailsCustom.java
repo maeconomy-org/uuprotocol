@@ -15,7 +15,7 @@ import java.util.Collection;
 @AllArgsConstructor
 public class UserDetailsCustom implements UserDetails {
 
-    private String userUuid;
+    private String userUUID;
 
     private Object credentials;
 

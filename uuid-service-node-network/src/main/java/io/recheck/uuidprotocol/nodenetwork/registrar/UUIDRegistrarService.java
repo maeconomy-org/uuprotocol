@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UUIDRegistrarService {
 
-    private final RestTemplateImpl restTemplateImpl;
+    private final RestTemplateImpl restTemplateImplUUIDRegistrar;
 
     public UUIDRecord findByUUID(String uuid) {
         RequestSpec<?, UUIDRecord> requestSpec = new RequestSpec<>();
@@ -23,7 +23,7 @@ public class UUIDRegistrarService {
         requestSpec.setResourceAddress("/api/UUID/"+uuid);
         requestSpec.setResponseBodyClass(UUIDRecord.class);
 
-        ResponseSpec<UUIDRecord> responseSpec = restTemplateImpl.send(requestSpec);
+        ResponseSpec<UUIDRecord> responseSpec = restTemplateImplUUIDRegistrar.send(requestSpec);
         return responseSpec.getBody();
     }
 
@@ -35,7 +35,7 @@ public class UUIDRegistrarService {
         requestSpec.setBody(new UUIDRecordAuthorizePostRequestDTO(userUuid, resourceId));
 
         requestSpec.setResponseBodyClass(UUIDRecordAuthorizePostResponseDTO.class);
-        ResponseSpec<UUIDRecordAuthorizePostResponseDTO> responseSpec = restTemplateImpl.send(requestSpec);
+        ResponseSpec<UUIDRecordAuthorizePostResponseDTO> responseSpec = restTemplateImplUUIDRegistrar.send(requestSpec);
         return responseSpec.getBody();
     }
 
@@ -47,7 +47,7 @@ public class UUIDRegistrarService {
         requestSpec.setBody(new UUIDRecordMetaPutRequestDTO(uuid, nodeType));
 
         requestSpec.setResponseBodyClass(UUIDRecord.class);
-        ResponseSpec<UUIDRecord> responseSpec = restTemplateImpl.send(requestSpec);
+        ResponseSpec<UUIDRecord> responseSpec = restTemplateImplUUIDRegistrar.send(requestSpec);
         return responseSpec.getBody();
     }
 

@@ -26,8 +26,8 @@ public class RegistrarDataSource extends AuditDataSource<UUIDRecord> {
         return createOrUpdate(pojoAudit);
     }
 
-    public List<UUIDRecord> findByOwnerUuid(String ownerUuid) {
-        return where(Filter.equalTo("ownerUuid", ownerUuid));
+    public List<UUIDRecord> findByOwnerUUID(String ownerUUID) {
+        return where(Filter.equalTo("ownerUUID", ownerUUID));
     }
 
     public UUIDRecord findByUuid(String uuid) {

@@ -1,11 +1,10 @@
 package io.recheck.uuidprotocol.nodenetwork.aggregate;
 
 
-import io.recheck.uuidprotocol.domain.aggregate.dto.create.AggregateCreateDTO;
-import io.recheck.uuidprotocol.domain.audit.AuditUser;
-import io.recheck.uuidprotocol.domain.registrar.model.UUIDRegExp;
 import io.recheck.uuidprotocol.domain.aggregate.dto.AggregateFindDTO;
+import io.recheck.uuidprotocol.domain.aggregate.dto.create.AggregateCreateDTO;
 import io.recheck.uuidprotocol.domain.aggregate.model.AggregateEntity;
+import io.recheck.uuidprotocol.domain.registrar.model.UUIDRegExp;
 import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.AggregateRepository;
 import jakarta.validation.Valid;
@@ -31,8 +30,7 @@ public class AggregateController {
 
     @GetMapping
     public Page<AggregateEntity> find(@AuthenticationPrincipal UserDetailsCustom user, AggregateFindDTO aggregateFindDTO) {
-        aggregateFindDTO.setCreatedBy(new AuditUser(user));
-        return aggregateRepository.find(aggregateFindDTO);
+        return aggregateRepository.find(user, aggregateFindDTO);
     }
 
     @PostMapping

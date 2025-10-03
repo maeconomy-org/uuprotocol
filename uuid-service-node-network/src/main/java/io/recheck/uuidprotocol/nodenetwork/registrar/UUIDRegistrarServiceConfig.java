@@ -12,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
 public class UUIDRegistrarServiceConfig {
 
     @Bean
-    public RestTemplateImpl restTemplateImpl(SslBundles sslBundles, ServerSpec serverSpec) {
-        return RestTemplateImplBuilder.build(sslBundles, serverSpec);
+    public RestTemplateImpl restTemplateImplUUIDRegistrar(SslBundles sslBundles, ServerSpec serverSpecUUIDRegistrar) {
+        return RestTemplateImplBuilder.build(sslBundles, serverSpecUUIDRegistrar);
     }
 
     @Bean
     @ConfigurationProperties(prefix = "uuid-service-registrar-config.server-spec")
-    public ServerSpec serverSpec() {
+    public ServerSpec serverSpecUUIDRegistrar() {
         return new ServerSpec();
     }
 

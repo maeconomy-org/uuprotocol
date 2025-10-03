@@ -1,9 +1,9 @@
 package io.recheck.uuidprotocol.user.auth.x509;
 
+import io.recheck.uuidprotocol.user.auth.x509.certificate.CertificateInfo;
 import io.recheck.uuidprotocol.user.domain.X509UserDetails;
 import io.recheck.uuidprotocol.user.persistence.X509UserDataSource;
 import io.recheck.uuidprotocol.user.service.X509UserService;
-import io.recheck.uuidprotocol.user.auth.x509.certificate.CertificateInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

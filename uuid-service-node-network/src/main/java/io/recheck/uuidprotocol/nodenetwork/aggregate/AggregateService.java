@@ -155,7 +155,7 @@ public class AggregateService {
 
     private UUIDRecord createUUID(UserDetailsCustom user, String nodeType, FirestoreDataSourceBatchModel batchModel) {
         String uuid = UUID.randomUUID().toString();
-        UUIDRecord uuidRecord = new UUIDRecord(uuid, user.getUserUuid(), new UUIDRecordMeta());
+        UUIDRecord uuidRecord = new UUIDRecord(uuid, user.getUserUUID(), new UUIDRecordMeta());
         uuidRecord.getUuidRecordMeta().setNodeType(nodeType);
         return createAudit(uuidRecord, user, batchModel);
     }

@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.common.config.firebase;
+package io.recheck.uuidprotocol.common.firestore.config;
 
 import io.recheck.uuidprotocol.common.yaml.YamlPropertySourceFactory;
 import lombok.Data;
