@@ -1,16 +1,12 @@
 package io.recheck.uuidprotocol.common.firestore;
 
 import com.google.cloud.firestore.*;
-import io.recheck.uuidprotocol.common.firestore.model.FirestoreId;
-import io.recheck.uuidprotocol.common.utils.ReflectionUtils;
-import io.recheck.uuidprotocol.domain.audit.AuditUser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,68 +36,32 @@ public class FirestoreDataSource<T_COLLECTION> {
     public T_COLLECTION createOrUpdate(T_COLLECTION pojo) {
         CollectionReference collectionReference = getCollection();
         DocumentReference documentReference;
-        String documentId = getId(pojo);
+        String documentId = FirestoreUtils.getId(pojo);
         if (StringUtils.hasText(documentId)) {
             documentReference = collectionReference.document(documentId);
         }
         else {
             documentReference = collectionReference.document();
-            setId(pojo, documentReference.getId());
+            FirestoreUtils.setId(pojo, documentReference.getId());
         }
         documentReference.set(pojo).get();
         return pojo;
     }
 
-    @SneakyThrows
-    public String getId(Object object) {
-        return ReflectionUtils.getValueAnnotationPresent(FirestoreId.class, object);
-    }
-
-    @SneakyThrows
-    private void setId(Object object, String id) {
-        ReflectionUtils.setValueAnnotationPresent(FirestoreId.class, object, id);
-    }
-
-    @SneakyThrows
-    public List<T_COLLECTION> whereCreatedByUserUUID(AuditUser user, Object filterCriteria, Map<String, Query.Direction> orderByFields) {
-        List<Filter> filters = getFilters(filterCriteria);
-        filters.add(Filter.equalTo("createdBy.userUUID", user.getUserUUID()));
-        return where(Filter.and(filters.toArray(new Filter[0])), orderByFields);
-    }
-
-    @SneakyThrows
-    public List<T_COLLECTION> where(Object filterCriteria, Map<String, Query.Direction> orderByFields) {
-        List<Filter> filters = getFilters(filterCriteria);
-        return where(Filter.and(filters.toArray(new Filter[0])), orderByFields);
-    }
-
-    @SneakyThrows
-    private List<Filter> getFilters(Object filterCriteria) {
-        List<Filter> filters = new ArrayList<>();
-
-        List<Field> allFields = ReflectionUtils.getAllFields(filterCriteria.getClass());
-        for (Field field : allFields) {
-            Object value = field.get(filterCriteria);
-            if (value != null) { //filter by all fields that has non empty value
-                if (value instanceof String) {
-                    if (!StringUtils.hasText((CharSequence) value)) {
-                        continue;
-                    }
-                }
-                filters.add(Filter.equalTo(field.getName(), value));
-            }
-        }
-
-        return filters;
-    }
 
 
-    public T_COLLECTION whereFindFirst(Filter filter) {
-        return where(filter, null).stream().findFirst().orElse(null);
-    }
 
     public List<T_COLLECTION> where(Filter filter) {
         return where(filter, null);
+    }
+
+    public List<T_COLLECTION> where(Object filterCriteria, Map<String, Query.Direction> orderByFields) {
+        List<Filter> filters = FirestoreUtils.getFilters(filterCriteria);
+        return where(Filter.and(filters.toArray(new Filter[0])), orderByFields);
+    }
+
+    public T_COLLECTION whereFindFirst(Filter filter) {
+        return where(filter, null).stream().findFirst().orElse(null);
     }
 
     public T_COLLECTION whereFindFirst(Filter filter, Map<String, Query.Direction> orderByFields) {
@@ -109,22 +69,16 @@ public class FirestoreDataSource<T_COLLECTION> {
     }
 
     public List<T_COLLECTION> where(Filter filter, Map<String, Query.Direction> orderByFields) {
-        return documentSnapshotToObjects(getDocuments(filter, orderByFields));
+        return documentSnapshotToObjects(getDocuments(getWhereQuery(filter, orderByFields)));
     }
 
-    @SneakyThrows
     public List<T_COLLECTION> whereArrayContains(String field, Object value) {
         CollectionReference collection = getCollection();
-        return documentSnapshotToObjects(collection.whereArrayContains(field, value).get().get().getDocuments());
+        Query query = collection.whereArrayContains(field, value);
+        return documentSnapshotToObjects(getDocuments(query));
     }
 
 
-
-
-    @SneakyThrows
-    private List<QueryDocumentSnapshot> getDocuments(Filter filter, Map<String, Query.Direction> orderByFields) {
-        return getWhereQuery(filter, orderByFields).get().get().getDocuments();
-    }
 
     @SneakyThrows
     private Query getWhereQuery(Filter filter, Map<String, Query.Direction> orderByFields) {
@@ -149,6 +103,11 @@ public class FirestoreDataSource<T_COLLECTION> {
         }
 
         return query;
+    }
+
+    @SneakyThrows
+    private List<QueryDocumentSnapshot> getDocuments(Query query) {
+        return query.get().get().getDocuments();
     }
 
     private List<T_COLLECTION> documentSnapshotToObjects(Iterable<QueryDocumentSnapshot> queryDocumentSnapshots) {

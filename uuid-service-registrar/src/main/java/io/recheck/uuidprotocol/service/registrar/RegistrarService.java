@@ -19,9 +19,9 @@ public class RegistrarService {
 
     private final RegistrarDataSource registrarDataSource;
 
-    public UUIDRecord createUUID(UserDetailsCustom user) {
+    public UUIDRecord create(UserDetailsCustom user) {
         String uuid = UUID.randomUUID().toString();
-        UUIDRecord uuidRecord = new UUIDRecord(uuid, user.getUserUuid(), null);
+        UUIDRecord uuidRecord = new UUIDRecord(uuid, user.getUserUUID(), null);
         return registrarDataSource.createAudit(uuidRecord, user);
     }
 
@@ -30,7 +30,7 @@ public class RegistrarService {
         if (existingUUIDRecord == null) {
             throw new NotFoundException("UUID not found");
         }
-        if (!existingUUIDRecord.getOwnerUuid().equals(dto.getUserUuid())) {
+        if (!existingUUIDRecord.getOwnerUUID().equals(dto.getUserUuid())) {
             throw new ForbiddenException("The UUID does not belong to this user");
         }
         return new UUIDRecordAuthorizePostResponseDTO(true);

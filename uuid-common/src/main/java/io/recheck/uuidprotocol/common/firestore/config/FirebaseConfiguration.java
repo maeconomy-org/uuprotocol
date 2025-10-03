@@ -1,4 +1,4 @@
-package io.recheck.uuidprotocol.common.config.firebase;
+package io.recheck.uuidprotocol.common.firestore.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;

@@ -1,10 +1,10 @@
 package io.recheck.uuidprotocol.nodenetwork.node.service;
 
-import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
 import io.recheck.uuidprotocol.domain.node.dto.UUFileDTO;
 import io.recheck.uuidprotocol.domain.node.model.UUFile;
 import io.recheck.uuidprotocol.domain.statements.dto.UUStatementDTO;
 import io.recheck.uuidprotocol.domain.statements.model.UUStatementPredicate;
+import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener.AggregateUUFileEventListener;
 import io.recheck.uuidprotocol.nodenetwork.node.persistence.UUFileDataSource;
 import io.recheck.uuidprotocol.nodenetwork.registrar.UUIDRegistrarService;
@@ -83,7 +83,7 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
 
     @SneakyThrows
     public ResponseEntity<Resource> downloadFile(UserDetailsCustom user, String uuid) {
-        uuidRegistrarService.authorize(user.getUserUuid(), uuid);
+        uuidRegistrarService.authorize(user.getUserUUID(), uuid);
         UUFile last = dataSource.findLast(uuid);
         if (last == null) {
             return ResponseEntity.notFound().build();

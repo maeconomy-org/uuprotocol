@@ -16,7 +16,7 @@ public class X509UserService {
 
     public X509UserDetails create(X509UserDetails user) {
         String uuid = UUID.randomUUID().toString();
-        user.setUserUuid(uuid);
+        user.setUserUUID(uuid);
         user.setCreatedAt(Instant.now());
         x509UserDataSource.create(user);
         return user;

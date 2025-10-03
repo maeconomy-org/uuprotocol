@@ -20,7 +20,7 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
     protected final UUIDRegistrarService uuidRegistrarService;
 
     public TNode softDeleteAndCreate(TNodeDTO dto, UserDetailsCustom user) {
-        uuidRegistrarService.authorize(user.getUserUuid(), dto.getUuid());
+        uuidRegistrarService.authorize(user.getUserUUID(), dto.getUuid());
 
         validateAndUpdateType(dto, user);
 
@@ -42,7 +42,7 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
     }
 
     public TNode softDelete(String uuid, UserDetailsCustom user) {
-        uuidRegistrarService.authorize(user.getUserUuid(), uuid);
+        uuidRegistrarService.authorize(user.getUserUUID(), uuid);
 
         TNode last = dataSource.findLast(uuid);
         if (last == null) {

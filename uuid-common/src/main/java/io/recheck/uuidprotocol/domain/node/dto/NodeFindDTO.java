@@ -1,7 +1,5 @@
 package io.recheck.uuidprotocol.domain.node.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.recheck.uuidprotocol.domain.audit.AuditUser;
 import io.recheck.uuidprotocol.domain.registrar.model.UUIDRegExp;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -17,8 +15,5 @@ public class NodeFindDTO {
     private String uuid;
 
     private Boolean softDeleted;
-
-    @JsonIgnore
-    private AuditUser createdBy;
 
 }

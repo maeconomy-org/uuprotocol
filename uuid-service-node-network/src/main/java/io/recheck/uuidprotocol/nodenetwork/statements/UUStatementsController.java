@@ -1,6 +1,5 @@
 package io.recheck.uuidprotocol.nodenetwork.statements;
 
-import io.recheck.uuidprotocol.domain.audit.AuditUser;
 import io.recheck.uuidprotocol.domain.statements.dto.UUStatementDTO;
 import io.recheck.uuidprotocol.domain.statements.dto.UUStatementFindDTO;
 import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
