@@ -1,12 +1,12 @@
 package io.recheck.uuidprotocol.service.registrar;
 
+import com.google.cloud.firestore.Filter;
 import io.recheck.uuidprotocol.common.exceptions.ForbiddenException;
 import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
 import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordAuthorizePostRequestDTO;
 import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordAuthorizePostResponseDTO;
 import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordMetaPutRequestDTO;
 import io.recheck.uuidprotocol.domain.registrar.model.UUIDRecord;
-import io.recheck.uuidprotocol.domain.registrar.model.UUIDRecordMeta;
 import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,8 +38,8 @@ public class RegistrarService {
 
     public UUIDRecord updateUUIDRecordMeta(UUIDRecordMetaPutRequestDTO dto) {
         UUIDRecord uuidRecord = registrarDataSource.findByUuid(dto.getUuid());
-        uuidRecord.setUuidRecordMeta(new UUIDRecordMeta(dto.getNodeType()));
-        return registrarDataSource.createOrUpdate(uuidRecord);
+        uuidRecord.setUuidRecordMeta(dto.getUuidRecordMeta());
+        return registrarDataSource.updateFirst(Filter.equalTo("uuid", dto.getUuid()), uuidRecord);
     }
 
 }

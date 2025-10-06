@@ -39,4 +39,12 @@ public class UUStatementsDataSource extends AuditDataSource<UUStatements> {
         return super.where(Filter.and(filters.toArray(new Filter[0])), orderByLastUpdatedAt);
     }
 
+    public UUStatements softDelete(UUStatements existingObject, UserDetailsCustom user) {
+        Filter filter = Filter.and(Filter.equalTo("subject", existingObject.getSubject()),
+                Filter.equalTo("predicate", existingObject.getPredicate()),
+                Filter.equalTo("object", existingObject.getObject()));
+        Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
+        return super.softDeleteAudit(filter, orderByLastUpdatedAt, existingObject, user);
+    }
+
 }

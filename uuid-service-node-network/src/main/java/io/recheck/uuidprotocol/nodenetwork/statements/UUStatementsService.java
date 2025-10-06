@@ -74,7 +74,7 @@ public class UUStatementsService {
             throw new NotFoundException("Not found for soft delete");
         }
         else if (!lastUpdated.getSoftDeleted()) {
-            lastUpdated = uuStatementsDataSource.softDeleteAudit(lastUpdated, user);
+            lastUpdated = uuStatementsDataSource.softDelete(lastUpdated, user);
         }
         return lastUpdated;
     }

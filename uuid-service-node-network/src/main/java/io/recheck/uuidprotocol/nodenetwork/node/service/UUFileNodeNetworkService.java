@@ -84,7 +84,7 @@ public class UUFileNodeNetworkService extends NodeNetworkService<UUFile, UUFileD
     @SneakyThrows
     public ResponseEntity<Resource> downloadFile(UserDetailsCustom user, String uuid) {
         uuidRegistrarService.authorize(user.getUserUUID(), uuid);
-        UUFile last = dataSource.findLast(uuid);
+        UUFile last = dataSource.findLastUpdated(uuid);
         if (last == null) {
             return ResponseEntity.notFound().build();
         }
