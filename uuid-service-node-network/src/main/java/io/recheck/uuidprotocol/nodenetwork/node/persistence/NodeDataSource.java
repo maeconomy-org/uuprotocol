@@ -18,28 +18,9 @@ public class NodeDataSource<T extends Node> extends AuditDataSource<T> {
     }
 
     public T findLastUpdated(String uuid) {
-        Filter filter = Filter.and(Filter.equalTo("uuid", uuid), Filter.equalTo("softDeleted", false));
+        Filter filter = Filter.and(Filter.equalTo("uuid", uuid));
         Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
         return whereFindFirst(filter, orderByLastUpdatedAt);
-    }
-
-    public T findLastDeleted(String uuid) {
-        Filter filter = Filter.and(Filter.equalTo("uuid", uuid), Filter.equalTo("softDeleted", true));
-        Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("softDeletedAt", Query.Direction.DESCENDING);
-        return whereFindFirst(filter, orderByLastUpdatedAt);
-    }
-
-    public T findLast(String uuid) {
-        T lastUpdated = findLastUpdated(uuid);
-        T lastDeleted = findLastDeleted(uuid);
-
-        if (lastUpdated != null) {
-            if (lastDeleted == null || lastUpdated.getLastUpdatedAt().isAfter(lastDeleted.getSoftDeletedAt())) {
-                return lastUpdated;
-            }
-        }
-
-        return lastDeleted;
     }
 
     public List<T> findByDTOAndOrderByLastUpdatedAt(UserDetailsCustom user, NodeFindDTO dto) {
@@ -47,6 +28,12 @@ public class NodeDataSource<T extends Node> extends AuditDataSource<T> {
         List<Filter> filters = FirestoreUtils.getFilters(dto);
         filters.add(Filter.equalTo("createdBy.userUUID", user.getUserUUID()));
         return super.where(Filter.and(filters.toArray(new Filter[0])), orderByLastUpdatedAt);
+    }
+
+    public T softDelete(T existingObject, UserDetailsCustom user) {
+        Filter filter = Filter.and(Filter.equalTo("uuid", existingObject.getUuid()));
+        Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
+        return super.softDeleteAudit(filter, orderByLastUpdatedAt, existingObject, user);
     }
 
 }

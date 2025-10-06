@@ -103,7 +103,7 @@ public class AggregateUUStatementsEventListener implements AggregateAuditEventLi
     private <TNode extends Node> TNode findNode(String uuid) {
         Class<TNode> parentType = uuNodeResolver.getNodeClassTypeOfUUID(uuid);
         NodeDataSource<TNode> parentDataSource = uuNodeResolver.getNodeDataSourceForType(parentType);
-        return parentDataSource.findLast(uuid);
+        return parentDataSource.findLastUpdated(uuid);
     }
 
 }

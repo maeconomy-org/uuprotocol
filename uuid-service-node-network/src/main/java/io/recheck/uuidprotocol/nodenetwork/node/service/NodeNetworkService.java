@@ -5,6 +5,7 @@ import io.recheck.uuidprotocol.common.exceptions.NotFoundException;
 import io.recheck.uuidprotocol.domain.node.dto.NodeDTO;
 import io.recheck.uuidprotocol.domain.node.model.Node;
 import io.recheck.uuidprotocol.domain.registrar.model.UUIDRecord;
+import io.recheck.uuidprotocol.domain.registrar.model.UUIDRecordMeta;
 import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
 import io.recheck.uuidprotocol.nodenetwork.aggregate.persistence.listener.AggregateNodeEventListener;
 import io.recheck.uuidprotocol.nodenetwork.node.persistence.NodeDataSource;
@@ -24,9 +25,9 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
 
         validateAndUpdateType(dto, user);
 
-        TNode last = dataSource.findLast(dto.getUuid());
+        TNode last = dataSource.findLastUpdated(dto.getUuid());
         if (last != null && !last.getSoftDeleted()) {
-            dataSource.softDeleteAudit(last, user);
+            dataSource.softDelete(last, user);
         }
 
         TNode node = dataSource.createAudit(dto.build(), user);
@@ -44,12 +45,12 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
     public TNode softDelete(String uuid, UserDetailsCustom user) {
         uuidRegistrarService.authorize(user.getUserUUID(), uuid);
 
-        TNode last = dataSource.findLast(uuid);
+        TNode last = dataSource.findLastUpdated(uuid);
         if (last == null) {
             throw new NotFoundException("Not found for soft delete");
         }
         else if (!last.getSoftDeleted()) {
-            last = dataSource.softDeleteAudit(last, user);
+            last = dataSource.softDelete(last, user);
             aggregateNodeEventListener.postSoftDelete(last);
         }
 
@@ -65,7 +66,9 @@ public class NodeNetworkService<TNode extends Node, TNodeDTO extends NodeDTO<TNo
                 }
             }
             else {
-                uuidRegistrarService.updateUUIDRecordMeta(dto.getUuid(), dataSource.getCollectionType().getSimpleName());
+                UUIDRecordMeta uuidRecordMeta = new UUIDRecordMeta();
+                uuidRecordMeta.setNodeType(dataSource.getCollectionType().getSimpleName());
+                uuidRegistrarService.updateUUIDRecordMeta(dto.getUuid(), uuidRecordMeta);
             }
         }
     }

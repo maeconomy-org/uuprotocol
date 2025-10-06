@@ -33,21 +33,22 @@ public class FirestoreDataSource<T_COLLECTION> {
     }
 
     @SneakyThrows
-    public T_COLLECTION createOrUpdate(T_COLLECTION pojo) {
-        CollectionReference collectionReference = getCollection();
-        DocumentReference documentReference;
-        String documentId = FirestoreUtils.getId(pojo);
-        if (StringUtils.hasText(documentId)) {
-            documentReference = collectionReference.document(documentId);
-        }
-        else {
-            documentReference = collectionReference.document();
-            FirestoreUtils.setId(pojo, documentReference.getId());
-        }
-        documentReference.set(pojo).get();
-        return pojo;
+    public T_COLLECTION updateFirst(Filter filter, T_COLLECTION pojo) {
+        return updateFirst(filter, null, pojo);
     }
 
+    @SneakyThrows
+    public T_COLLECTION updateFirst(Filter filter, Map<String, Query.Direction> orderByFields, T_COLLECTION pojo) {
+        QueryDocumentSnapshot queryDocumentSnapshot = getDocuments(getWhereQuery(filter, orderByFields))
+                .stream().findFirst().orElse(null);
+
+        if (queryDocumentSnapshot != null && queryDocumentSnapshot.exists()) {
+            queryDocumentSnapshot.getReference().set(pojo).get();
+            return pojo;
+        }
+
+        return null;
+    }
 
 
 

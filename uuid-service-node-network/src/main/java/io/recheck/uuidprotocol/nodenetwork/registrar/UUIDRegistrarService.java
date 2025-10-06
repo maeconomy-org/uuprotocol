@@ -7,6 +7,7 @@ import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordAuthorizePostReque
 import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordAuthorizePostResponseDTO;
 import io.recheck.uuidprotocol.domain.registrar.dto.UUIDRecordMetaPutRequestDTO;
 import io.recheck.uuidprotocol.domain.registrar.model.UUIDRecord;
+import io.recheck.uuidprotocol.domain.registrar.model.UUIDRecordMeta;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -39,12 +40,12 @@ public class UUIDRegistrarService {
         return responseSpec.getBody();
     }
 
-    public UUIDRecord updateUUIDRecordMeta(String uuid, String nodeType) {
+    public UUIDRecord updateUUIDRecordMeta(String uuid, UUIDRecordMeta uuidRecordMeta) {
         RequestSpec<UUIDRecordMetaPutRequestDTO, UUIDRecord> requestSpec = new RequestSpec<>();
         requestSpec.setHttpMethod(HttpMethod.PUT);
         requestSpec.setResourceAddress("/api/UUID/UUIDRecordMeta");
 
-        requestSpec.setBody(new UUIDRecordMetaPutRequestDTO(uuid, nodeType));
+        requestSpec.setBody(new UUIDRecordMetaPutRequestDTO(uuid, uuidRecordMeta));
 
         requestSpec.setResponseBodyClass(UUIDRecord.class);
         ResponseSpec<UUIDRecord> responseSpec = restTemplateImplUUIDRegistrar.send(requestSpec);
