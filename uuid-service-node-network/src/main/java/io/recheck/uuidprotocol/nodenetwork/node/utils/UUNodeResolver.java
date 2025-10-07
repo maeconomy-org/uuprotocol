@@ -30,18 +30,18 @@ public class UUNodeResolver {
         return (Class<TNode>) Class.forName("io.recheck.uuidprotocol.domain.node.model."+uuidRecord.getUuidRecordMeta().getNodeType());
     }
 
-    public <TNode extends Node> NodeDataSource<TNode> getNodeDataSourceForType(Class<TNode> targetType) {
+    public <TNode extends Node> NodeDataSource<TNode> getNodeDataSourceForNodeType(Class<TNode> nodeType) {
         Map<String, NodeDataSource> beans = applicationContext.getBeansOfType(NodeDataSource.class);
 
         for (NodeDataSource<?> bean : beans.values()) {
             Class<?> actualClass = AopUtils.getTargetClass(bean); // handles Spring proxies
 
-            if (ReflectionUtils.isMatchingGenericType(actualClass, targetType)) {
+            if (ReflectionUtils.isMatchingGenericType(actualClass, nodeType)) {
                 //noinspection unchecked
                 return (NodeDataSource<TNode>) bean;
             }
         }
 
-        throw new IllegalArgumentException("No NodeDataSource found for type: " + targetType);
+        throw new IllegalArgumentException("No NodeDataSource found for node type: " + nodeType);
     }
 }
