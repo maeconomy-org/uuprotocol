@@ -2,6 +2,7 @@ package io.recheck.uuidprotocol.common.resttemplate.model;
 
 import lombok.Data;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -12,6 +13,7 @@ public class RequestSpec<REQ,RES> {
     private HttpMethod httpMethod;
     private String resourceAddress;
     private MultiValueMap<String, String> resourceQueryParams = new LinkedMultiValueMap<>();
+    private HttpHeaders httpHeaders;
 
     private REQ body;
 
