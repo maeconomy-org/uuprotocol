@@ -29,6 +29,18 @@ import java.util.Collections;
 public class RestTemplateImplBuilder {
 
     @SneakyThrows
+    public static RestTemplateImpl build(ServerSpec serverSpec) {
+
+        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+        SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
+                .build();
+
+        return build(sslContext, serverSpec);
+    }
+
+    @SneakyThrows
     public static RestTemplateImpl build(SslBundles sslBundles, ServerSpec serverSpec) {
         SslBundle sslBundle = sslBundles.getBundle(serverSpec.getSsl().getBundle());
 

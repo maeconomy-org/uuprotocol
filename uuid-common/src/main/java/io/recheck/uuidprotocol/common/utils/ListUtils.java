@@ -6,8 +6,8 @@ import java.util.stream.Stream;
 
 public class ListUtils {
 
-    public static List<List<? extends Object>> batches(List<? extends Object> source, int length) {
-        List<List<? extends Object>> chunks = new ArrayList<>();
+    public static <T> List<List<T>> batches(List<T> source, int length) {
+        List<List<T>> chunks = new ArrayList<>();
 
         int size = source.size();
         for (int i = 0; i < size; i += length) {
