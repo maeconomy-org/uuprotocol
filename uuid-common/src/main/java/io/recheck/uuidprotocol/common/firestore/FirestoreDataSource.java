@@ -1,11 +1,11 @@
 package io.recheck.uuidprotocol.common.firestore;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class FirestoreDataSource<T_COLLECTION> {
     }
 
     public List<T_COLLECTION> where(Object filterCriteria, Map<String, Query.Direction> orderByFields) {
-        List<Filter> filters = FirestoreUtils.getFilters(filterCriteria);
+        List<Filter> filters = FirestoreUtils.toFirestoreFilters(filterCriteria);
         return where(Filter.and(filters.toArray(new Filter[0])), orderByFields);
     }
 

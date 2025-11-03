@@ -2,7 +2,7 @@ package io.recheck.uuidprotocol.nodenetwork.statements;
 
 import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Query;
-import io.recheck.uuidprotocol.common.firestore.FirestoreUtils;
+import io.recheck.uuidprotocol.common.firestore.model.*;
 import io.recheck.uuidprotocol.domain.statements.dto.UUStatementFindDTO;
 import io.recheck.uuidprotocol.domain.statements.model.UUStatements;
 import io.recheck.uuidprotocol.domain.user.UserDetailsCustom;
@@ -15,36 +15,50 @@ import java.util.Map;
 @Service
 public class UUStatementsDataSource extends AuditDataSource<UUStatements> {
 
+    WrapUnaryEqualToFilter subjectFilter = new WrapUnaryEqualToFilter("subject");
+    WrapUnaryEqualToFilter objectFilter = new WrapUnaryEqualToFilter("object");
+    WrapUnaryEqualToFilter predicateFilter = new WrapUnaryEqualToFilter("predicate");
+    WrapUnaryEqualToFilter createdByUuidFilter = new WrapUnaryEqualToFilter("createdBy.userUUID");
+
+    QueryDirection lastUpdatedAtDesc = new QueryDirection("lastUpdatedAt", Query.Direction.DESCENDING);
+
+    InspectableFilter existBySubjectAndObject = new WrapCompositeOrFilter(List.of(subjectFilter, objectFilter));
+    InspectableFilter findLastUpdated = new WrapCompositeAndFilter(List.of(subjectFilter, predicateFilter, objectFilter), List.of(lastUpdatedAtDesc));
+
+    WrapDTOCompositeAndFilter<UUStatementFindDTO> wrapUUStatementFindDTOCompositeAndFilter =
+            new WrapDTOCompositeAndFilter<>(UUStatementFindDTO.class, List.of(createdByUuidFilter), List.of(lastUpdatedAtDesc));
+
     public UUStatementsDataSource() {
         super(UUStatements.class);
     }
 
     public UUStatements findLastUpdated(UUStatements uuStatements) {
-        Filter filter = Filter.and(Filter.equalTo("subject", uuStatements.getSubject()),
-                                    Filter.equalTo("predicate", uuStatements.getPredicate()),
-                                    Filter.equalTo("object", uuStatements.getObject()));
-        Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
-        return whereFindFirst(filter, orderByLastUpdatedAt);
+        Filter findFilter = findLastUpdated.toFirestoreFilter(Map.of(
+                "subject", uuStatements.getSubject(),
+                "predicate", uuStatements.getPredicate(),
+                "object", uuStatements.getObject()));
+        Map<String, Query.Direction> lastUpdatedAtDescDirection = findLastUpdated.getQueryDirectionsMap();
+        return whereFindFirst(findFilter, lastUpdatedAtDescDirection);
     }
 
     public Boolean exist(String uuid) {
-        Filter filter = Filter.or(Filter.equalTo("subject", uuid), Filter.equalTo("object", uuid));
-        return where(filter).stream().findFirst().isPresent();
+        return whereFindFirst(existBySubjectAndObject.toFirestoreFilter(Map.of("subject", uuid, "object", uuid))) != null;
     }
 
     public List<UUStatements> findByDTOAndOrderByLastUpdatedAt(UserDetailsCustom user, UUStatementFindDTO dto) {
-        Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
-        List<Filter> filters = FirestoreUtils.getFilters(dto);
-        filters.add(Filter.equalTo("createdBy.userUUID", user.getUserUUID()));
-        return super.where(Filter.and(filters.toArray(new Filter[0])), orderByLastUpdatedAt);
+        WrapCompositeAndFilter wrapFilter = wrapUUStatementFindDTOCompositeAndFilter.getWrapFilter(dto);
+        return super.where(
+                wrapUUStatementFindDTOCompositeAndFilter.toFirestoreFilter(wrapFilter, dto, Map.of("createdBy.userUUID", user.getUserUUID())),
+                wrapFilter.getQueryDirectionsMap());
     }
 
     public UUStatements softDelete(UUStatements existingObject, UserDetailsCustom user) {
-        Filter filter = Filter.and(Filter.equalTo("subject", existingObject.getSubject()),
-                Filter.equalTo("predicate", existingObject.getPredicate()),
-                Filter.equalTo("object", existingObject.getObject()));
-        Map<String, Query.Direction> orderByLastUpdatedAt = Map.of("lastUpdatedAt", Query.Direction.DESCENDING);
-        return super.softDeleteAudit(filter, orderByLastUpdatedAt, existingObject, user);
+        Filter findFilter = findLastUpdated.toFirestoreFilter(Map.of(
+                "subject", existingObject.getSubject(),
+                "predicate", existingObject.getPredicate(),
+                "object", existingObject.getObject()));
+        Map<String, Query.Direction> lastUpdatedAtDescDirection = findLastUpdated.getQueryDirectionsMap();
+        return super.softDeleteAudit(findFilter, lastUpdatedAtDescDirection, existingObject, user);
     }
 
 }
