@@ -61,11 +61,15 @@ public class UUStatementsService {
 
     private UUStatements findOrCreate(UUStatements uuStatements, UserDetailsCustom user) {
         UUStatements lastUpdated = uuStatementsDataSource.findLastUpdated(uuStatements);
-        if (lastUpdated == null || lastUpdated.getSoftDeleted()) {
-            lastUpdated = uuStatementsDataSource.createAudit(uuStatements, user);
-            aggregateUUStatementsEventListener.postCreate(lastUpdated);
+        if (lastUpdated != null && !lastUpdated.getSoftDeleted()) {
+            uuStatementsDataSource.softDelete(lastUpdated, user);
         }
-        return lastUpdated;
+
+        UUStatements newStatement = uuStatementsDataSource.createAudit(uuStatements, user);
+        if (lastUpdated == null) {
+            aggregateUUStatementsEventListener.postCreate(newStatement);
+        }
+        return newStatement;
     }
 
     private UUStatements softDelete(UUStatements uuStatements, UserDetailsCustom user) {
